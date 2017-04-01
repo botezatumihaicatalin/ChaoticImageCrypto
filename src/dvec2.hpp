@@ -1,7 +1,7 @@
 #pragma once
 
 class dvec2 {
-  
+
 public:
   double x;
   double y;

@@ -3,17 +3,17 @@
 #include "./dvec2.hpp"
 
 class generator {
-  
+
 protected:
   dvec2 current_;
   dvec2 start_;
 
 public:
   explicit generator(dvec2 start) : current_(start), start_(start) {}
-  
+
   virtual ~generator() = default;
   virtual const dvec2& next() = 0;
-  
+
   const dvec2& next_n(size_t steps);
   const dvec2& current() const;
   const dvec2& start() const;

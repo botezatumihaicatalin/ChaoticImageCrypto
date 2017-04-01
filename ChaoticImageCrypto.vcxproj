@@ -18,8 +18,18 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\chaotic_generator.hpp" />
+    <ClInclude Include="src\dvec2.hpp" />
+    <ClInclude Include="src\generator.hpp" />
+    <ClInclude Include="src\serpentine_generator.hpp" />
+    <ClInclude Include="src\spic.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\ChaoticImageCrypto.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{F09A4A61-3528-4ED0-B509-32C02E654E22}</ProjectGuid>
+    <ProjectGuid>{573F0D72-D267-49D2-A86D-9F5DDAC9E3DF}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>ChaoticImageCrypto</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
@@ -86,8 +96,15 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
+      <Optimization>Full</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -141,16 +158,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="src\ChaoticImageCrypto.cpp" />
-    <ClCompile Include="src\serpentine_generator.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\chaotic_generator.hpp" />
-    <ClInclude Include="src\dvec2.hpp" />
-    <ClInclude Include="src\generator.hpp" />
-    <ClInclude Include="src\serpentine_generator.hpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

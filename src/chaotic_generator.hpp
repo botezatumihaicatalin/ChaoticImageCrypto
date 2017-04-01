@@ -3,7 +3,7 @@
 #include "generator.hpp"
 
 class chaotic_generator: public generator {
-  
+
 protected:
   double exponent_;
 

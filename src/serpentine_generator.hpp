@@ -1,13 +1,13 @@
 #pragma once
 
 #include "chaotic_generator.hpp"
-#include "cmath"
+#include <cmath>
 
 class serpentine_generator: public chaotic_generator {
 
 protected:
   double pow_2_exponent_;
-  
+
 public:
   serpentine_generator(const dvec2& start, const double& exponent) :
     chaotic_generator(start, exponent), pow_2_exponent_(pow(2, exponent)) {};
@@ -21,5 +21,3 @@ inline const dvec2& serpentine_generator::next() {
   current_.y = sin(exp_y) * cos(exp_y);
   return current_;
 }
-
-
