@@ -11,6 +11,8 @@ protected:
 public:
   serpentine_generator(const dvec2& start, const double& exponent) :
     chaotic_generator(start, exponent), pow_2_exponent_(pow(2, exponent)) {};
+  serpentine_generator(const double& x, const double& y, const double& exponent) :
+    chaotic_generator(x, y, exponent), pow_2_exponent_(pow(2, exponent)) {};
   const dvec2& next() override;
 };
 

@@ -10,6 +10,7 @@ protected:
 
 public:
   explicit generator(dvec2 start) : current_(start), start_(start) {}
+  explicit generator(const double& x, const double& y) : generator(dvec2(x, y)) {};
 
   virtual ~generator() = default;
   virtual const dvec2& next() = 0;
