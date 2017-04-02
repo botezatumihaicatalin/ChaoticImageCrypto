@@ -178,10 +178,10 @@ inline uint8_t* spic::encrypt(uint8_t* pixels, uint32_t size) const {
   double x01 = M_PI / 4.0, y01 = 1.0 / 4.0;
   double x02 = -M_PI / 4.0, y02 = -1 / 20.0;
   uint32_t m1 = 2017, m2 = 2016;
-  double iv = 123456;
+  uint32_t iv = 123456;
 
   std::unique_ptr<generator> mapper1(new serpentine_generator(dvec2(x01, y01), r1));
-  std::unique_ptr<generator> mapper2(new serpentine_generator(dvec2(x02, y02), r1));
+  std::unique_ptr<generator> mapper2(new serpentine_generator(dvec2(x02, y02), r2));
 
   mapper1->next_n(m1) , mapper2->next_n(m2);
 
@@ -193,10 +193,10 @@ inline uint8_t* spic::decrypt(uint8_t* pixels, uint32_t size) const {
   double x01 = M_PI / 4.0, y01 = 1.0 / 4.0;
   double x02 = -M_PI / 4.0, y02 = -1 / 20.0;
   uint32_t m1 = 2017, m2 = 2016;
-  double iv = 123456;
+  uint32_t iv = 123456;
 
   std::unique_ptr<generator> mapper1(new serpentine_generator(dvec2(x01, y01), r1));
-  std::unique_ptr<generator> mapper2(new serpentine_generator(dvec2(x02, y02), r1));
+  std::unique_ptr<generator> mapper2(new serpentine_generator(dvec2(x02, y02), r2));
 
   mapper1->next_n(m1) , mapper2->next_n(m2);
 
