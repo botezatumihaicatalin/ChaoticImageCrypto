@@ -1,7 +1,7 @@
 #pragma once
 
 #include "dvec2.hpp"
-#include <cstdint>
+#include <stdint.h>
 
 class spic_key {
 

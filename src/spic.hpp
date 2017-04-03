@@ -4,10 +4,11 @@
 #define M_PI 3.14159265359
 #endif
 
-#include <cstdint>
-#include <cstring>
+#include <string.h>
+#include <math.h>
 #include <cmath>
-#include <memory>
+#include <stdint.h>
+#include <iostream>
 #include "generator.hpp"
 #include "serpentine_generator.hpp"
 
@@ -28,14 +29,14 @@ public:
 };
 
 inline uint32_t spic::discretize(const double& value) {
-  static double TEN_TO_FIFTEEN = pow(10, 15);
-  return abs(floor(TEN_TO_FIFTEEN * value));
+  static double TEN_TO_FIFTEEN = std::pow(10.0, 15);
+  return std::abs(std::floor(TEN_TO_FIFTEEN * value));
 }
 
 inline uint32_t* spic::permutation_(uint32_t size, generator* mapper) {
   uint32_t* perm = new uint32_t[size];
-  std::unique_ptr<bool[]> has(new bool[size]);
-  memset(has.get(), false, size * sizeof(bool));
+  bool* has = new bool[size];
+  memset(has, false, size * sizeof(bool));
 
   uint32_t max = size, i = 0;
   dvec2 p = mapper->current();
@@ -80,25 +81,31 @@ inline uint32_t* spic::inversate_(uint32_t* permutation, uint32_t size) {
 
 inline uint8_t* spic::shuffle_(uint8_t* pixels, uint32_t size, generator* mapper) {
   uint8_t* shuffled = new uint8_t[size];
-  std::unique_ptr<uint32_t[]> permutation(permutation_(size / 4, mapper));
+  uint32_t* permutation = permutation_(size / 4, mapper);
   const size_t copy_size = 4 * sizeof(uint8_t);
 
   for (uint32_t i = 0; i < size / 4; i++) {
     memcpy(&shuffled[permutation[i] * 4], &pixels[i * 4], copy_size);
   }
 
+  delete[] permutation;
+
   return shuffled;
 }
 
 inline uint8_t* spic::unshuffle_(uint8_t* pixels, uint32_t size, generator* mapper) {
   uint8_t* unshuffled = new uint8_t[size];
-  std::unique_ptr<uint32_t[]> permutation(permutation_(size / 4, mapper));
-  std::unique_ptr<uint32_t[]> inverse(inversate_(permutation.get(), size / 4));
+
+  uint32_t* permutation = permutation_(size / 4, mapper);
+  uint32_t* inverse = inversate_(permutation, size / 4);
+
   size_t copy_size = 4 * sizeof(uint8_t);
 
   for (uint32_t i = 0; i < size / 4; i++) {
     memcpy(&unshuffled[inverse[i] * 4], &pixels[i * 4], copy_size);
   }
+
+  delete[] permutation, delete[] inverse;
 
   return unshuffled;
 }
@@ -180,12 +187,18 @@ inline uint8_t* spic::encrypt(uint8_t* pixels, uint32_t size) const {
   uint32_t m1 = 2017, m2 = 2016;
   uint32_t iv = 123456;
 
-  std::unique_ptr<generator> mapper1(new serpentine_generator(dvec2(x01, y01), r1));
-  std::unique_ptr<generator> mapper2(new serpentine_generator(dvec2(x02, y02), r2));
+  generator* mapper1 = new serpentine_generator(dvec2(x01, y01), r1);
+  generator* mapper2 = new serpentine_generator(dvec2(x02, y02), r2);
 
   mapper1->next_n(m1) , mapper2->next_n(m2);
 
-  return substitute_(shuffle_(pixels, size, mapper1.get()), size, mapper2.get(), iv);
+  uint8_t* shuffled = shuffle_(pixels, size, mapper1);
+  uint8_t* substituted = substitute_(shuffled, size, mapper2, iv);
+
+  delete mapper1, delete mapper2;
+  delete[] shuffled;
+
+  return substituted;
 }
 
 inline uint8_t* spic::decrypt(uint8_t* pixels, uint32_t size) const {
@@ -195,10 +208,16 @@ inline uint8_t* spic::decrypt(uint8_t* pixels, uint32_t size) const {
   uint32_t m1 = 2017, m2 = 2016;
   uint32_t iv = 123456;
 
-  std::unique_ptr<generator> mapper1(new serpentine_generator(dvec2(x01, y01), r1));
-  std::unique_ptr<generator> mapper2(new serpentine_generator(dvec2(x02, y02), r2));
+  generator* mapper1 = new serpentine_generator(dvec2(x01, y01), r1);
+  generator* mapper2 = new serpentine_generator(dvec2(x02, y02), r2);
 
   mapper1->next_n(m1) , mapper2->next_n(m2);
 
-  return unshuffle_(unsubstitute_(pixels, size, mapper2.get(), iv), size, mapper1.get());
+  uint8_t* unsubstituted = unsubstitute_(pixels, size, mapper2, iv);
+  uint8_t* unshuffled = unshuffle_(unsubstituted, size, mapper1);
+
+  delete mapper1, delete mapper2;
+  delete[] unsubstituted;
+
+  return unshuffled;
 }
