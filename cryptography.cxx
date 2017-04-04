@@ -2,7 +2,7 @@
 #include "src/spic.hpp"
 #include <iostream>
 
-spic encryptor;
+spic<4> encryptor;
 
 NAN_METHOD(Encrypt) {
   if (info[0]->IsUint8ClampedArray()) {
