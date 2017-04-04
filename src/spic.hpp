@@ -41,20 +41,21 @@ inline uint32_t* spic::permutation_(uint32_t size, generator* mapper) {
   uint32_t max = size, i = 0;
   dvec2 p = mapper->current();
 
-  uint32_t aux = 0;
+  uint32_t aux_x = 0, aux_y = 0;
   bool found = false;
 
   while (i < size) {
     found = false;
-    aux = discretize(p.x) % size;
-    if (!has[aux]) {
-      perm[i++] = aux , has[aux] = true;
+
+    aux_x = discretize(p.x) % size;
+    aux_y = discretize(p.y) % size;
+
+    if (!has[aux_x]) {
+      perm[i++] = aux_x, has[aux_x] = true;
       found = true;
     }
-
-    aux = discretize(p.y) % size;
-    if (!has[aux]) {
-      perm[i++] = aux , has[aux] = true;
+    if (!has[aux_y]) {
+      perm[i++] = aux_y, has[aux_y] = true;
       found = true;
     }
 
