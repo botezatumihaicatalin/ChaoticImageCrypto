@@ -39,7 +39,7 @@ int main() {
   clock_t start, end;
   
   start = clock();
-  spic encryptor;
+  spic<4> encryptor;
   std::unique_ptr<uint8_t[]> encrypted(encryptor.encrypt(pixels.get(), size * channels));
   end = clock();
 

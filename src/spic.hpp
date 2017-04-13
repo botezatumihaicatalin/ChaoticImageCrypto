@@ -10,8 +10,8 @@
 #include <stdint.h>
 #include <iostream>
 #include <stdexcept>
-#include "generator.hpp"
-#include "serpentine_generator.hpp"
+#include "generator2.hpp"
+#include "serpentine_generator2.hpp"
 
 template <size_t spectrum> class spic {
 
@@ -20,14 +20,14 @@ private:
 
   static uint32_t discretize(const double& value);
 
-  static uint32_t* permutation_(uint32_t size, generator* mapper);
+  static uint32_t* permutation_(uint32_t size, generator2* mapper);
   static uint32_t* inversate_(uint32_t* permutation, uint32_t size);
 
-  static uint8_t* shuffle_(uint8_t* pixels, uint32_t size, generator* mapper);
-  static uint8_t* unshuffle_(uint8_t* pixels, uint32_t size, generator* mapper);
+  static uint8_t* shuffle_(uint8_t* pixels, uint32_t size, generator2* mapper);
+  static uint8_t* unshuffle_(uint8_t* pixels, uint32_t size, generator2* mapper);
 
-  static uint8_t* substitute_(uint8_t* pixels, uint32_t size, generator* mapper, uint32_t iv);
-  static uint8_t* unsubstitute_(uint8_t* pixels, uint32_t size, generator* mapper, uint32_t iv);
+  static uint8_t* substitute_(uint8_t* pixels, uint32_t size, generator2* mapper, uint32_t iv);
+  static uint8_t* unsubstitute_(uint8_t* pixels, uint32_t size, generator2* mapper, uint32_t iv);
 
 public:
   uint8_t* encrypt(uint8_t* pixels, uint32_t size) const;
@@ -44,7 +44,7 @@ inline uint32_t spic<spectrum>::discretize(const double& value) {
 }
 
 template <size_t spectrum>
-inline uint32_t* spic<spectrum>::permutation_(uint32_t size, generator* mapper) {
+inline uint32_t* spic<spectrum>::permutation_(uint32_t size, generator2* mapper) {
   uint32_t* perm = new uint32_t[size];
   bool* has = new bool[size];
   memset(has, false, size * sizeof(bool));
@@ -93,7 +93,7 @@ inline uint32_t* spic<spectrum>::inversate_(uint32_t* permutation, uint32_t size
 }
 
 template <size_t spectrum>
-inline uint8_t* spic<spectrum>::shuffle_(uint8_t* pixels, uint32_t size, generator* mapper) {
+inline uint8_t* spic<spectrum>::shuffle_(uint8_t* pixels, uint32_t size, generator2* mapper) {
   if (size % spectrum != 0) {
     throw std::invalid_argument("Size must be a multiple of spectrum");
   }
@@ -111,7 +111,7 @@ inline uint8_t* spic<spectrum>::shuffle_(uint8_t* pixels, uint32_t size, generat
 }
 
 template <size_t spectrum>
-inline uint8_t* spic<spectrum>::unshuffle_(uint8_t* pixels, uint32_t size, generator* mapper) {
+inline uint8_t* spic<spectrum>::unshuffle_(uint8_t* pixels, uint32_t size, generator2* mapper) {
   if (size % spectrum != 0) {
     throw std::invalid_argument("Size must be a multiple of spectrum");
   }
@@ -131,7 +131,7 @@ inline uint8_t* spic<spectrum>::unshuffle_(uint8_t* pixels, uint32_t size, gener
 }
 
 template <size_t spectrum>
-inline uint8_t* spic<spectrum>::substitute_(uint8_t* pixels, uint32_t size, generator* mapper, uint32_t iv) {
+inline uint8_t* spic<spectrum>::substitute_(uint8_t* pixels, uint32_t size, generator2* mapper, uint32_t iv) {
   if (size % spectrum != 0) {
     throw std::invalid_argument("Size must be a multiple of spectrum");
   }
@@ -173,7 +173,7 @@ inline uint8_t* spic<spectrum>::substitute_(uint8_t* pixels, uint32_t size, gene
 }
 
 template <size_t spectrum>
-inline uint8_t* spic<spectrum>::unsubstitute_(uint8_t* pixels, uint32_t size, generator* mapper, uint32_t iv) {
+inline uint8_t* spic<spectrum>::unsubstitute_(uint8_t* pixels, uint32_t size, generator2* mapper, uint32_t iv) {
   if (size % spectrum != 0) {
     throw std::invalid_argument("Size must be a multiple of spectrum");
   }
@@ -222,8 +222,8 @@ inline uint8_t* spic<spectrum>::encrypt(uint8_t* pixels, uint32_t size) const {
   uint32_t m1 = 2017, m2 = 2016;
   uint32_t iv = 123456;
 
-  generator* mapper1 = new serpentine_generator(dvec2(x01, y01), r1);
-  generator* mapper2 = new serpentine_generator(dvec2(x02, y02), r2);
+  generator2* mapper1 = new serpentine_generator2(dvec2(x01, y01), r1);
+  generator2* mapper2 = new serpentine_generator2(dvec2(x02, y02), r2);
 
   mapper1->next_n(m1) , mapper2->next_n(m2);
 
@@ -244,8 +244,8 @@ inline uint8_t* spic<spectrum>::decrypt(uint8_t* pixels, uint32_t size) const {
   uint32_t m1 = 2017, m2 = 2016;
   uint32_t iv = 123456;
 
-  generator* mapper1 = new serpentine_generator(dvec2(x01, y01), r1);
-  generator* mapper2 = new serpentine_generator(dvec2(x02, y02), r2);
+  generator2* mapper1 = new serpentine_generator2(dvec2(x01, y01), r1);
+  generator2* mapper2 = new serpentine_generator2(dvec2(x02, y02), r2);
 
   mapper1->next_n(m1) , mapper2->next_n(m2);
 

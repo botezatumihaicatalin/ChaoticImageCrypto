@@ -19,10 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\chaotic_generator.hpp" />
     <ClInclude Include="src\dvec2.hpp" />
-    <ClInclude Include="src\generator.hpp" />
-    <ClInclude Include="src\serpentine_generator.hpp" />
+    <ClInclude Include="src\generator2.hpp" />
+    <ClInclude Include="src\generator1.hpp" />
+    <ClInclude Include="src\pwlcm_generator2.hpp" />
+    <ClInclude Include="src\serpentine_generator2.hpp" />
     <ClInclude Include="src\spic.hpp" />
   </ItemGroup>
   <ItemGroup>
