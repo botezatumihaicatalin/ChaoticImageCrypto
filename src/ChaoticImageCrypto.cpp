@@ -7,7 +7,8 @@
 #include <cmath>
 #include <iomanip>
 #include <memory>
-#include "spic.hpp"
+#include "pwlcm_spic.hpp"
+#include "serpentine_spic.hpp"
 
 template<typename T>
 void print_array(T* array, size_t size) {
@@ -39,7 +40,7 @@ int main() {
   clock_t start, end;
   
   start = clock();
-  spic<4> encryptor;
+  serpentine_spic<4> encryptor;
   std::unique_ptr<uint8_t[]> encrypted(encryptor.encrypt(pixels.get(), size * channels));
   end = clock();
 

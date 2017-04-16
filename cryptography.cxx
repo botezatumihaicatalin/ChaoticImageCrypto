@@ -1,8 +1,8 @@
 #include <nan.h>
-#include "src/spic.hpp"
+#include "src/pwlcm_spic.hpp"
 #include <iostream>
 
-spic<4> encryptor;
+pwlcm_spic<4> encryptor;
 
 NAN_METHOD(Encrypt) {
   if (info[0]->IsUint8ClampedArray()) {
