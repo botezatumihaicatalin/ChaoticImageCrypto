@@ -6,7 +6,7 @@
         "cryptography.cxx"
       ],
       "include_dirs": [
-        "<!(node -e \"require(\"nan\")\")"
+        "<!(node -e \"require('nan')\")"
       ],
       "cflags!": [
         "-fno-exceptions"
