@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <stdexcept>
 #include "generator2.hpp"
+#include "spic_key.hpp"
 
 template <size_t spectrum> class spic {
 
@@ -26,6 +27,7 @@ protected:
 
 public:
   virtual ~spic() = default;
+  virtual void init_key(spic_key* key) = 0;
   virtual uint8_t* encrypt(uint8_t* pixels, uint32_t size) const = 0;
   virtual uint8_t* decrypt(uint8_t* pixels, uint32_t size) const = 0;
 };

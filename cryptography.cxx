@@ -1,8 +1,9 @@
 #include <nan.h>
 #include "src/pwlcm_spic.hpp"
+#include "src/pwlcm_spic_key.hpp"
 #include <iostream>
 
-pwlcm_spic<4> encryptor;
+pwlcm_spic<4> image_cipher;
 
 NAN_METHOD(Encrypt) {
   if (info[0]->IsUint8ClampedArray()) {
@@ -11,7 +12,7 @@ NAN_METHOD(Encrypt) {
     Nan::TypedArrayContents<uint8_t> inputContents(inputArray);
 
     // Perform the encryption.
-    uint8_t* output = encryptor.encrypt(*inputContents, inputContents.length());
+    uint8_t* output = image_cipher.encrypt(*inputContents, inputContents.length());
 
     // Create output Uint8Array.
     v8::Local<v8::ArrayBuffer> outputBuffer = v8::ArrayBuffer::New(v8::Isolate::GetCurrent(), inputContents.length());
@@ -30,7 +31,7 @@ NAN_METHOD(Encrypt) {
     Nan::TypedArrayContents<uint8_t> inputContents(inputArray);
 
     // Perform the encryption.
-    uint8_t* output = encryptor.encrypt(*inputContents, inputContents.length());
+    uint8_t* output = image_cipher.encrypt(*inputContents, inputContents.length());
 
     // Create output Uint8Array.
     v8::Local<v8::ArrayBuffer> outputBuffer = v8::ArrayBuffer::New(v8::Isolate::GetCurrent(), inputContents.length());
@@ -55,7 +56,7 @@ NAN_METHOD(Decrypt) {
     Nan::TypedArrayContents<uint8_t> inputContents(inputArray);
 
     // Perform the encryption.
-    uint8_t* output = encryptor.decrypt(*inputContents, inputContents.length());
+    uint8_t* output = image_cipher.decrypt(*inputContents, inputContents.length());
 
     // Create output Uint8Array.
     v8::Local<v8::ArrayBuffer> outputBuffer = v8::ArrayBuffer::New(v8::Isolate::GetCurrent(), inputContents.length());
@@ -74,7 +75,7 @@ NAN_METHOD(Decrypt) {
     Nan::TypedArrayContents<uint8_t> inputContents(inputArray);
 
     // Perform the encryption.
-    uint8_t* output = encryptor.decrypt(*inputContents, inputContents.length());
+    uint8_t* output = image_cipher.decrypt(*inputContents, inputContents.length());
 
     // Create output Uint8Array.
     v8::Local<v8::ArrayBuffer> outputBuffer = v8::ArrayBuffer::New(v8::Isolate::GetCurrent(), inputContents.length());
@@ -93,6 +94,8 @@ NAN_METHOD(Decrypt) {
 }
 
 NAN_MODULE_INIT(Initialize) {
+  image_cipher.init_key(new pwlcm_spic_key(dvec2(0.1567, 0.3219), dvec2(0.4567, 0.1111),
+                                           0.2, 0.3, 2017, 2016, 123456));
   NAN_EXPORT(target, Encrypt);
   NAN_EXPORT(target, Decrypt);
 }

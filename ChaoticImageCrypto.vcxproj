@@ -24,9 +24,12 @@
     <ClInclude Include="src\generator1.hpp" />
     <ClInclude Include="src\pwlcm_generator2.hpp" />
     <ClInclude Include="src\pwlcm_spic.hpp" />
+    <ClInclude Include="src\pwlcm_spic_key.hpp" />
     <ClInclude Include="src\serpentine_generator2.hpp" />
     <ClInclude Include="src\serpentine_spic.hpp" />
+    <ClInclude Include="src\serpentine_spic_key.hpp" />
     <ClInclude Include="src\spic.hpp" />
+    <ClInclude Include="src\spic_key.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ChaoticImageCrypto.cpp" />

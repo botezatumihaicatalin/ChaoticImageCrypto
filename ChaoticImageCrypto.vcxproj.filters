@@ -39,6 +39,15 @@
     <ClInclude Include="src\pwlcm_spic.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\spic_key.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pwlcm_spic_key.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\serpentine_spic_key.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ChaoticImageCrypto.cpp">
