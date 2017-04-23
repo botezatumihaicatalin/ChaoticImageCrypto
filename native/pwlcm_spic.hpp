@@ -24,8 +24,8 @@ class PwlcmSpicCipher : public BaseSpicCipher {
   pwlcm_spic<4> image_cipher_;
 
   explicit PwlcmSpicCipher(): BaseSpicCipher(&image_cipher_) {
-    image_cipher_.init_key(new pwlcm_spic_key(dvec2(0.1567, 0.3219), dvec2(0.4567, 0.1111),
-                                              0.2, 0.3, 2017, 2016, 123456));
+    image_cipher_.init_key(pwlcm_spic_key(dvec2(0.1567, 0.3219), dvec2(0.4567, 0.1111),
+                                                0.2, 0.3, 2017, 2016, 123456));
   }
   virtual ~PwlcmSpicCipher() {}
 

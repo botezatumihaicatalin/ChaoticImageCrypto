@@ -25,9 +25,13 @@ protected:
   static uint8_t* substitute_(uint8_t* pixels, uint32_t size, generator2* mapper, uint32_t iv);
   static uint8_t* unsubstitute_(uint8_t* pixels, uint32_t size, generator2* mapper, uint32_t iv);
 
+  static uint8_t* do_encryption_(uint8_t* pixels, uint32_t size, 
+                                generator2* mapper1, generator2* mapper2, uint32_t iv);
+  static uint8_t* do_decryption_(uint8_t* pixels, uint32_t size, 
+                                generator2* mapper1, generator2* mapper2, uint32_t iv);
+
 public:
   virtual ~spic() = default;
-  virtual void init_key(spic_key* key) = 0;
   virtual uint8_t* encrypt(uint8_t* pixels, uint32_t size) const = 0;
   virtual uint8_t* decrypt(uint8_t* pixels, uint32_t size) const = 0;
 };
@@ -211,3 +215,23 @@ inline uint8_t* spic<spectrum>::unsubstitute_(uint8_t* pixels, uint32_t size, ge
 
   return decrypted;
 }
+
+template<size_t spectrum>
+inline uint8_t * spic<spectrum>::do_decryption_(uint8_t * pixels, uint32_t size,
+                                               generator2 * mapper1, generator2 * mapper2, uint32_t iv) {
+  uint8_t* unsubstituted = unsubstitute_(pixels, size, mapper2, iv);
+  uint8_t* unshuffled = unshuffle_(unsubstituted, size, mapper1);
+  
+  delete[] unsubstituted; return unshuffled;
+}
+
+template <size_t spectrum>
+inline uint8_t* spic<spectrum>::do_encryption_(uint8_t* pixels, uint32_t size, 
+                                              generator2* mapper1, generator2* mapper2, uint32_t iv) {
+  uint8_t* shuffled = shuffle_(pixels, size, mapper1);
+  uint8_t* substituted = substitute_(shuffled, size, mapper2, iv);
+  
+  delete[] shuffled; return substituted;
+}
+
+

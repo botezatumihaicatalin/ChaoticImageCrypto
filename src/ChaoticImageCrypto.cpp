@@ -38,12 +38,13 @@ int main() {
   }
 
   clock_t start, end;
+  
+  serpentine_spic<4> encryptor;
+  encryptor.init_key(serpentine_spic_key(dvec2(M_PI / 4.0, 1.0 / 4.0),
+                                         dvec2(-M_PI / 4.0, -1 / 20.0),
+                                         10, 20, 2017, 2016, 123456));
 
   start = clock();
-  serpentine_spic<4> encryptor;
-  encryptor.init_key(new serpentine_spic_key(dvec2(M_PI / 4.0, 1.0 / 4.0),
-                                             dvec2(-M_PI / 4.0, -1 / 20.0),
-                                             10, 20, 2017, 2016, 123456));
   std::unique_ptr<uint8_t[]> encrypted(encryptor.encrypt(pixels.get(), size * channels));
   end = clock();
 
