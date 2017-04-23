@@ -32,7 +32,7 @@ public:
   virtual uint8_t* decrypt(uint8_t* pixels, uint32_t size) const = 0;
 };
 
-template<size_t spectrum>
+template <size_t spectrum>
 size_t const spic<spectrum>::pixel_size = spectrum * sizeof(uint8_t);
 
 template <size_t spectrum>
@@ -60,11 +60,11 @@ inline uint32_t* spic<spectrum>::permutation_(uint32_t size, generator2* mapper)
     aux_y = discretize(p.y) % size;
 
     if (!has[aux_x]) {
-      perm[i++] = aux_x, has[aux_x] = true;
+      perm[i++] = aux_x , has[aux_x] = true;
       found = true;
     }
     if (!has[aux_y]) {
-      perm[i++] = aux_y, has[aux_y] = true;
+      perm[i++] = aux_y , has[aux_y] = true;
       found = true;
     }
 
@@ -123,7 +123,7 @@ inline uint8_t* spic<spectrum>::unshuffle_(uint8_t* pixels, uint32_t size, gener
     memcpy(&unshuffled[inverse[i] * spectrum], &pixels[i * spectrum], pixel_size);
   }
 
-  delete[] permutation, delete[] inverse;
+  delete[] permutation , delete[] inverse;
 
   return unshuffled;
 }

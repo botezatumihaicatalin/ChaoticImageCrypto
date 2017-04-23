@@ -6,7 +6,7 @@
 #include "pwlcm_spic_key.hpp"
 
 template <size_t spectrum>
-class pwlcm_spic : protected spic<spectrum> {
+class pwlcm_spic : public spic<spectrum> {
 
 private:
   pwlcm_spic_key* key_;
@@ -54,7 +54,7 @@ inline uint8_t* pwlcm_spic<spectrum>::decrypt(uint8_t* pixels, uint32_t size) co
   generator2* mapper1 = new pwlcm_generator2(key_->p1(), key_->r1());
   generator2* mapper2 = new pwlcm_generator2(key_->p2(), key_->r2());
 
-  mapper1->next_n(key_->m1()), mapper2->next_n(key_->m2());
+  mapper1->next_n(key_->m1()) , mapper2->next_n(key_->m2());
 
   uint8_t* unsubstituted = unsubstitute_(pixels, size, mapper2, key_->iv());
   uint8_t* unshuffled = unshuffle_(unsubstituted, size, mapper1);

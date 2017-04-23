@@ -10,7 +10,7 @@
 #include "pwlcm_spic.hpp"
 #include "serpentine_spic.hpp"
 
-template<typename T>
+template <typename T>
 void print_array(T* array, size_t size) {
   std::cout << "The array: ";
   for (size_t i = 0; i < size - 1; i ++) {
@@ -19,7 +19,7 @@ void print_array(T* array, size_t size) {
   std::cout << +array[size - 1] << "\n";
 }
 
-template<typename T>
+template <typename T>
 bool arrays_are_equal(T* array1, T* array2, size_t size) {
   bool result = true;
   for (size_t i = 0; i < size; i++) {
@@ -36,13 +36,13 @@ int main() {
   for (uint32_t i = 0; i < size; i++) {
     std::fill(&pixels[i * 4], &pixels[i * 4 + 4], i);
   }
-  
+
   clock_t start, end;
-  
+
   start = clock();
   serpentine_spic<4> encryptor;
-  encryptor.init_key(new serpentine_spic_key(dvec2(M_PI / 4.0, 1.0 / 4.0), 
-                                             dvec2(-M_PI / 4.0, -1 / 20.0), 
+  encryptor.init_key(new serpentine_spic_key(dvec2(M_PI / 4.0, 1.0 / 4.0),
+                                             dvec2(-M_PI / 4.0, -1 / 20.0),
                                              10, 20, 2017, 2016, 123456));
   std::unique_ptr<uint8_t[]> encrypted(encryptor.encrypt(pixels.get(), size * channels));
   end = clock();
@@ -60,7 +60,7 @@ int main() {
     print_array(encrypted.get(), size * channels);
     print_array(decrypted.get(), size * channels);
   }
-  
+
   if (arrays_are_equal(pixels.get(), decrypted.get(), size * channels)) {
     std::cout << "The decyption is the same as encryption \n";
   }

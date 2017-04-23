@@ -10,7 +10,7 @@
 #include "serpentine_spic_key.hpp"
 
 template <size_t spectrum>
-class serpentine_spic: protected spic<spectrum> {
+class serpentine_spic: public spic<spectrum> {
 
 private:
   serpentine_spic_key* key_;
@@ -23,8 +23,8 @@ public:
   uint8_t* decrypt(uint8_t* pixels, uint32_t size) const override;
 };
 
-template<size_t spectrum>
-inline void serpentine_spic<spectrum>::init_key(spic_key * key) {
+template <size_t spectrum>
+inline void serpentine_spic<spectrum>::init_key(spic_key* key) {
   auto key_casted = dynamic_cast<serpentine_spic_key*>(key);
   key_ = new serpentine_spic_key(*key_casted);
 }
@@ -38,12 +38,12 @@ inline uint8_t* serpentine_spic<spectrum>::encrypt(uint8_t* pixels, uint32_t siz
   generator2* mapper1 = new serpentine_generator2(key_->p1(), key_->r1());
   generator2* mapper2 = new serpentine_generator2(key_->p2(), key_->r2());
 
-  mapper1->next_n(key_->m1()), mapper2->next_n(key_->m2());
+  mapper1->next_n(key_->m1()) , mapper2->next_n(key_->m2());
 
   uint8_t* shuffled = shuffle_(pixels, size, mapper1);
   uint8_t* substituted = substitute_(shuffled, size, mapper2, key_->iv());
 
-  delete mapper1, delete mapper2;
+  delete mapper1 , delete mapper2;
   delete[] shuffled;
 
   return substituted;
@@ -58,12 +58,12 @@ inline uint8_t* serpentine_spic<spectrum>::decrypt(uint8_t* pixels, uint32_t siz
   generator2* mapper1 = new serpentine_generator2(key_->p1(), key_->r1());
   generator2* mapper2 = new serpentine_generator2(key_->p2(), key_->r2());
 
-  mapper1->next_n(key_->m1()), mapper2->next_n(key_->m2());
+  mapper1->next_n(key_->m1()) , mapper2->next_n(key_->m2());
 
   uint8_t* unsubstituted = unsubstitute_(pixels, size, mapper2, key_->iv());
   uint8_t* unshuffled = unshuffle_(unsubstituted, size, mapper1);
 
-  delete mapper1, delete mapper2;
+  delete mapper1 , delete mapper2;
   delete[] unsubstituted;
 
   return unshuffled;
