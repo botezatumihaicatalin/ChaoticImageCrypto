@@ -39,7 +39,7 @@ inline uint8_t* serpentine_spic<spectrum>::encrypt(uint8_t* pixels, uint32_t siz
 
   mapper1.next_n(key_->m1()) , mapper2.next_n(key_->m2());
 
-  return do_encryption_(pixels, size, &mapper1, &mapper2, key_->iv());
+  return this->do_encryption_(pixels, size, &mapper1, &mapper2, key_->iv());
 }
 
 template <size_t spectrum>
@@ -53,5 +53,5 @@ inline uint8_t* serpentine_spic<spectrum>::decrypt(uint8_t* pixels, uint32_t siz
 
   mapper1.next_n(key_->m1()) , mapper2.next_n(key_->m2());
 
-  return do_decryption_(pixels, size, &mapper1, &mapper2, key_->iv());
+  return this->do_decryption_(pixels, size, &mapper1, &mapper2, key_->iv());
 }
