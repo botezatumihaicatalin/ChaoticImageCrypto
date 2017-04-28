@@ -5,23 +5,26 @@
 #include "../src/pwlcm_spic.hpp"
 #include "../src/pwlcm_spic_key.hpp"
 
-class PwlcmSpicCipher : public BaseSpicCipher {
+template <size_t spectrum>
+class PwlcmSpicCipher : public BaseSpicCipher<spectrum> {
  public:
   static NAN_MODULE_INIT(Init) {
+    const std::string class_name = "PwlcmSpicCipher" + std::to_string(spectrum);
+
     v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
-    tpl->SetClassName(Nan::New("PwlcmSpicCipher").ToLocalChecked());
+    tpl->SetClassName(Nan::New(class_name).ToLocalChecked());
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
     Nan::SetPrototypeMethod(tpl, "encrypt", Encrypt);
     Nan::SetPrototypeMethod(tpl, "decrypt", Decrypt);
 
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
-    Nan::Set(target, Nan::New("PwlcmSpicCipher").ToLocalChecked(),
+    Nan::Set(target, Nan::New(class_name).ToLocalChecked(),
       Nan::GetFunction(tpl).ToLocalChecked());
   }
 
  private:
-  pwlcm_spic<4> image_cipher_;
+  pwlcm_spic<spectrum> image_cipher_;
 
   explicit PwlcmSpicCipher(): BaseSpicCipher(&image_cipher_) {
     image_cipher_.init_key(pwlcm_spic_key(dvec2(0.1567, 0.3219), dvec2(0.4567, 0.1111),

@@ -5,23 +5,26 @@
 #include "../src/serpentine_spic.hpp"
 #include "../src/serpentine_spic_key.hpp"
 
-class SerpentineSpicCipher : public BaseSpicCipher {
+template <size_t spectrum>
+class SerpentineSpicCipher : public BaseSpicCipher<spectrum> {
  public:
   static NAN_MODULE_INIT(Init) {
+    const std::string class_name = "SerpentineSpicCipher" + std::to_string(spectrum);
+
     v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
-    tpl->SetClassName(Nan::New("SerpentineSpicCipher").ToLocalChecked());
+    tpl->SetClassName(Nan::New(class_name).ToLocalChecked());
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
     Nan::SetPrototypeMethod(tpl, "encrypt", Encrypt);
     Nan::SetPrototypeMethod(tpl, "decrypt", Decrypt);
 
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
-    Nan::Set(target, Nan::New("SerpentineSpicCipher").ToLocalChecked(),
+    Nan::Set(target, Nan::New(class_name).ToLocalChecked(),
       Nan::GetFunction(tpl).ToLocalChecked());
   }
 
  private:
-  serpentine_spic<4> image_cipher_;
+  serpentine_spic<spectrum> image_cipher_;
 
   explicit SerpentineSpicCipher(): BaseSpicCipher(&image_cipher_) {
     image_cipher_.init_key(serpentine_spic_key(dvec2(M_PI / 4.0, 1.0 / 4.0), 

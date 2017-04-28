@@ -3,13 +3,14 @@
 #include <nan.h> 
 #include "../src/spic.hpp"
 
+template <size_t spectrum>
 class BaseSpicCipher : public Nan::ObjectWrap {
 
  private:
- 	spic<4>* image_cipher_;
+ 	spic<spectrum>* image_cipher_;
 
  protected:
- 	BaseSpicCipher(spic<4>* image_cipher): image_cipher_(image_cipher) { };
+ 	BaseSpicCipher(spic<spectrum>* image_cipher): image_cipher_(image_cipher) { };
  	virtual ~BaseSpicCipher() { };
 
   static NAN_METHOD(Encrypt) {
