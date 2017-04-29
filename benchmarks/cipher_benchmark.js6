@@ -24,6 +24,19 @@ export default class CipherBenchmark {
 		const chiEncrypted = this.chiSquareTest(encrypted)
 		console.log(`Chi square test results:`)
 		console.log(`Initial: ${chiInitial}, Encrypted: ${chiEncrypted}`)
+
+		const entropyInitial = this.globalEntropyTest(pixels)
+		const entropyEncrypted = this.globalEntropyTest(encrypted)
+		console.log(`Global entropy results:`)
+		console.log(`Initial: ${entropyInitial}, Encrypted: ${entropyEncrypted}`)
+
+		let pixels2 = _.clone(pixels), idx = 4 * _.random(0, pixels.length / 4)
+		pixels2[idx] = (pixels[idx] + 128) % 256
+		const encrypted2 = this.cipher.encrypt(pixels2)
+		const npcrValue = this.npcrTest(encrypted, encrypted2)
+		const uaciValue = this.uaciTest(encrypted, encrypted2)
+		console.log(`NPCR and UACI results: ${npcrValue}, ${uaciValue}`)
+		console.log('\n\n')
 	}
 
 	readAndTestImage(imagePath) {
@@ -55,5 +68,38 @@ export default class CipherBenchmark {
 		})
 
 		return chiSquare / expected
+	}
+
+	globalEntropyTest(pixels) {
+		const frequency = _.countBy(pixels, x => x)
+
+		let entropy = 0
+
+		_.times(256, pixel => {
+			const pixelFreq = frequency[pixel] || 0
+			
+			if (pixelFreq > 0) {
+				const probability = 1.0 * pixelFreq / pixels.length
+				entropy -= probability * Math.log2(probability)
+			}
+		})
+
+		return entropy
+	}
+
+	npcrTest(pixels1, pixels2) {
+		let sum = 0, len = pixels1.length
+		for (let i = 0; i < len; i ++) {
+			sum += +(pixels1[i] !== pixels2[i])
+		}
+		return `${(sum / len) * 100}%`
+	}
+
+	uaciTest(pixels1, pixels2) {
+		let sum = 0, len = pixels1.length
+		for (let i = 0; i < len; i ++) {
+			sum += Math.abs(pixels1[i] - pixels2[i]) / 255
+		}
+		return `${(sum / len) * 100}%`
 	}
 }
