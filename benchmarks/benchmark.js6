@@ -1,0 +1,17 @@
+import crypto from '../lib/bindings.js'
+import CipherBenchmark from './cipher_benchmark.js6'
+import imagesPaths from './test_images.js6'
+
+(async function() {
+	const pwlcmSpicCipher = new crypto.PwlcmSpicCipher4()
+	const pwlcmSpicBenchmark = new CipherBenchmark({
+		images: imagesPaths, cipher: pwlcmSpicCipher
+	})
+	await pwlcmSpicBenchmark.beginTests()
+
+	const serpentineSpicCipher = new crypto.SerpentineSpicCipher4()
+	const serpentineSpicBenchmark = new CipherBenchmark({
+		images: imagesPaths, cipher: serpentineSpicCipher
+	})
+	await serpentineSpicBenchmark.beginTests()
+})()

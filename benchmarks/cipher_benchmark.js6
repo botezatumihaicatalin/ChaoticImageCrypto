@@ -1,0 +1,59 @@
+import Jimp from 'jimp'
+import _ from 'lodash'
+import path from 'path'
+
+export default class CipherBenchmark {
+
+	constructor(options) {
+		this.images = options.images || [ ]
+		this.cipher = options.cipher
+	}
+
+	readFilePath(imagePath) {
+		return Jimp.read(imagePath)
+	}
+
+	testImage(bitmap) {
+		const pixels = new Uint8Array(bitmap.data)
+
+		console.time('Encryption')
+		const encrypted = this.cipher.encrypt(pixels)
+		console.timeEnd('Encryption')
+
+		const chiInitial = this.chiSquareTest(pixels)
+		const chiEncrypted = this.chiSquareTest(encrypted)
+		console.log(`Chi square test results:`)
+		console.log(`Initial: ${chiInitial}, Encrypted: ${chiEncrypted}`)
+	}
+
+	readAndTestImage(imagePath) {
+		console.log(`Beginning to test: ${path.basename(imagePath)}`)
+		return this.readFilePath(imagePath)
+			.then((image) => this.testImage(image.bitmap))
+			.catch(err => console.error(err))
+	}
+
+	beginTests() {
+		let promise = Promise.resolve()
+		_.forEach(this.images, imagePath => {
+			promise = promise.then(() => this.readAndTestImage(imagePath))
+				.catch(() => this.readAndTestImage(imagePath))
+		})
+		return promise.catch(_.noop)
+	}
+	
+	chiSquareTest(pixels) {
+		const expected = pixels.length / 256
+		const frequency = _.countBy(pixels, x => x)
+
+		let chiSquare = 0
+		
+		_.times(256, pixel => {
+			const pixelFreq = frequency[pixel] || 0
+			const deltaFreq = pixelFreq - expected
+			chiSquare += deltaFreq * deltaFreq
+		})
+
+		return chiSquare / expected
+	}
+}
