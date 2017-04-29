@@ -1,0 +1,142 @@
+import Jimp from 'jimp'
+import _ from 'lodash'
+import path from 'path'
+import { println } from './printing.js6'
+
+function analyzeCipher(name, options) {
+
+	const images = options.images
+	const cipher = options.cipher
+
+	const readFilePath = (imagePath) => {
+		return Jimp.read(imagePath)
+	}
+
+	const timeOperation = (method) => {
+		let start = _.now(); _.attempt(method)
+		return _.now() - start
+	}
+
+	const chiSquareTest = (pixels) => {
+		const expected = pixels.length / 256
+		const frequency = _.countBy(pixels, x => x)
+
+		let chiSquare = 0
+		
+		_.times(256, pixel => {
+			const pixelFreq = frequency[pixel] || 0
+			const deltaFreq = pixelFreq - expected
+			chiSquare += deltaFreq * deltaFreq
+		})
+
+		return chiSquare / expected
+	}
+
+	const globalEntropyTest = (pixels) => {
+		const frequency = _.countBy(pixels, x => x)
+
+		let entropy = 0
+
+		_.times(256, pixel => {
+			const pixelFreq = frequency[pixel] || 0
+			
+			if (pixelFreq > 0) {
+				const probability = 1.0 * pixelFreq / pixels.length
+				entropy -= probability * Math.log2(probability)
+			}
+		})
+
+		return entropy
+	}
+
+	const npcrTest = (pixels1, pixels2) => {
+		let sum = 0, len = pixels1.length
+		for (let i = 0; i < len; i ++) {
+			sum += +(pixels1[i] !== pixels2[i])
+		}
+		return `${(sum / len) * 100}%`
+	}
+
+	const uaciTest = (pixels1, pixels2) => {
+		let sum = 0, len = pixels1.length
+		for (let i = 0; i < len; i ++) {
+			sum += Math.abs(pixels1[i] - pixels2[i]) / 255
+		}
+		return `${(sum / len) * 100}%`
+	}
+
+	const testSourceQuality = (bitmap) => {
+		const pixels = new Uint8Array(bitmap.data)
+		return {
+			chiSquareValue: chiSquareTest(pixels),
+			globalEntropyValue: globalEntropyTest(pixels),
+			dimensions: [ bitmap.width, bitmap.height ]
+		}
+	}
+
+	const testEncryptionQuality = (bitmap) => {
+		const pixels1 = new Uint8Array(bitmap.data)
+		const pixels2 = new Uint8Array(bitmap.data)
+		const randIx = 4 * _.random(0, pixels2.length / 4)
+		pixels2[randIx] = (pixels2[randIx] + 128) % 256
+
+		let encrypted1 = undefined
+		const encryptDuration = timeOperation(() => {
+			encrypted1 = cipher.encrypt(pixels1)
+		})
+		const encrypted2 = cipher.encrypt(pixels2)
+		
+		return {
+			chiSquareValue: chiSquareTest(encrypted1),
+			globalEntropyValue: globalEntropyTest(encrypted1),
+			npcrValue: npcrTest(encrypted1, encrypted2),
+			uaciValue: uaciTest(encrypted1, encrypted2),
+			duration: encryptDuration
+		}
+	}
+
+	const testDecryptionQuality = (bitmap) => {
+		// TO DO:
+	}
+
+	const printSourceQuality = (output) => {
+		println(`Testing image quality`, 1, 'green')
+		println(`Dimensions are: ${output.dimensions.join(' x ')}`, 2, 'yellow')
+		println(`Chi Square Test is: ${output.chiSquareValue}`, 2, 'yellow')
+		println(`Global Entropy is: ${output.globalEntropyValue}`, 2, 'yellow')
+		return true
+	}
+
+	const printEncryptionQuality = (output, padding) => {
+		println(`Testing encryption quality`, 1, 'green')
+		println(`Encryption took ${output.duration} milliseconds`, 2, 'yellow')
+		println(`Chi Square Test is: ${output.chiSquareValue}`, 2, 'yellow')
+		println(`Global Entropy is: ${output.globalEntropyValue}`, 2, 'yellow')
+		println(`Number of Pixel Change Rate is: ${output.npcrValue}`, 2, 'yellow')
+		println(`Unified Average Changing Intensity is: ${output.uaciValue}`, 2, 'yellow')
+		return true
+	}
+
+	const printDecryptionQuality = (output, padding) => {
+		// TO DO:
+	}
+
+	const readAndTestImage = (imagePath) => {
+		println(`${name}: ${path.basename(imagePath)}`, 0, 'cyan')
+		return readFilePath(imagePath).then((image) => {
+			printSourceQuality(testSourceQuality(image.bitmap))
+			printEncryptionQuality(testEncryptionQuality(image.bitmap))
+			println('')
+			return true
+		}).catch(err => console.error(err))
+	}
+
+	println(`Firing up, ${name}`, 0, 'cyanBright')
+	let promise = Promise.resolve()
+	_.forEach(images, imagePath => {
+		promise = promise.then(() => readAndTestImage(imagePath))
+	})
+	return promise
+}
+
+export default analyzeCipher

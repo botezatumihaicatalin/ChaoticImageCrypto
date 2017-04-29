@@ -1,0 +1,16 @@
+import clc from 'cli-color'
+import _ from 'lodash'
+
+export function print(string, padding, color) {
+ 	if (color) {
+ 		string = clc[color](string)
+ 	}
+ 	if (padding > 0) {
+ 		string = _.repeat(' ', padding) + string
+ 	}
+ 	process.stdout.write(string)
+}
+
+export function println(string, padding, color) {
+	return print(string + '\n', padding, color)
+}

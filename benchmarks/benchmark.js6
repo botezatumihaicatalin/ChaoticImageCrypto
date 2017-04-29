@@ -1,17 +1,12 @@
 import crypto from '../lib/bindings.js'
-import CipherBenchmark from './cipher_benchmark.js6'
+import analyzeCipher from './analyze_cipher.js6'
 import imagesPaths from './test_images.js6'
 
 (async function() {
-	const pwlcmSpicCipher = new crypto.PwlcmSpicCipher4()
-	const pwlcmSpicBenchmark = new CipherBenchmark({
-		images: imagesPaths, cipher: pwlcmSpicCipher
+	await analyzeCipher('Spic cryptosystem with Pwlcm generator', {
+		images: imagesPaths, cipher: new crypto.PwlcmSpicCipher4()
 	})
-	await pwlcmSpicBenchmark.beginTests()
-
-	const serpentineSpicCipher = new crypto.SerpentineSpicCipher4()
-	const serpentineSpicBenchmark = new CipherBenchmark({
-		images: imagesPaths, cipher: serpentineSpicCipher
+	await analyzeCipher('Spic cryptosystem with Serpentine generator', {
+		images: imagesPaths, cipher: new crypto.SerpentineSpicCipher4()
 	})
-	await serpentineSpicBenchmark.beginTests()
 })()

@@ -22,6 +22,7 @@
   "devDependencies": {
     "babel-preset-es2015": "^6.24.1",
     "babel-register": "^6.24.1",
+    "cli-color": "^1.2.0",
     "jimp": "^0.2.27",
     "lodash": "^4.17.4"
   }
