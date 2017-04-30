@@ -15,6 +15,7 @@ public:
     : generator2(x, y), exponent_(exponent) {}
 
   const dvec2& next() override;
+  const double& exponent() const;
 
 private:
   static double next_pwlcm(const double& current, const double& exp);
@@ -35,4 +36,8 @@ inline const dvec2& pwlcm_generator2::next() {
   current_.x = next_pwlcm(current_.x, exponent_);
   current_.y = next_pwlcm(current_.y, exponent_);
   return current_;
+}
+
+inline const double & pwlcm_generator2::exponent() const {
+  return exponent_;
 }

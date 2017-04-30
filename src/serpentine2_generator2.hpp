@@ -2,33 +2,34 @@
 
 #include <cmath>
 #include "generator2.hpp"
+#include "tmath.hpp"
 
-class serpentine_generator2: public generator2 {
+// Same as serpentine_generator2, but with LUTS
+class serpentine2_generator2 : public generator2 {
 
 protected:
   double pow_2_exponent_;
   double exponent_;
 
 public:
-  serpentine_generator2(const dvec2& start, const double& exponent) :
+  serpentine2_generator2(const dvec2& start, const double& exponent) :
     generator2(start), pow_2_exponent_(pow(2, exponent)), exponent_(exponent) {}
 
-  serpentine_generator2(const double& x, const double& y, const double& exponent) :
+  serpentine2_generator2(const double& x, const double& y, const double& exponent) :
     generator2(x, y), pow_2_exponent_(pow(2, exponent)), exponent_(exponent) {}
 
   const dvec2& next() override;
   const double& exponent() const;
 };
 
-inline const dvec2& serpentine_generator2::next() {
+inline const dvec2& serpentine2_generator2::next() {
   const double exp_x = pow_2_exponent_ * current_.x;
   const double exp_y = pow_2_exponent_ * current_.y;
-  current_.x = std::atan(1.0 / std::tan(exp_x));
-  current_.y = std::sin(exp_y) * std::cos(exp_y);
+  current_.x = std::atan(1.0 / ttan(exp_x));
+  current_.y = tsin(exp_y) * tcos(exp_y);
   return current_;
 }
 
-inline const double& serpentine_generator2::exponent() const {
+inline const double& serpentine2_generator2::exponent() const {
   return exponent_;
 }
-
