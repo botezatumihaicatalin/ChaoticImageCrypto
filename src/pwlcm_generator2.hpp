@@ -1,43 +1,31 @@
 #pragma once
 
 #include "generator2.hpp"
+#include "pwlcm_generator1.hpp"
 
 class pwlcm_generator2 : public generator2 {
 
 protected:
-  double exponent_;
-
+  pwlcm_generator1 generator1_;
+  pwlcm_generator1 generator2_;
+   
 public:
   pwlcm_generator2(const dvec2& start, const double& exponent)
-    : generator2(start), exponent_(exponent) {}
+    : generator2(start), generator1_(start.x, exponent), generator2_(start.y, exponent) {}
 
   pwlcm_generator2(const double& x, const double& y, const double& exponent)
-    : generator2(x, y), exponent_(exponent) {}
+    : generator2(x, y), generator1_(x, exponent), generator2_(y, exponent) {}
 
   const dvec2& next() override;
   const double& exponent() const;
-
-private:
-  static double next_pwlcm(const double& current, const double& exp);
 };
 
-inline double pwlcm_generator2::next_pwlcm(const double& current, const double& exp) {
-  if (current >= 0 && current <= exp) {
-    return current / exp;
-  }
-  if (current >= exp && current < 0.5) {
-    return (current - exp) / (0.5 - exp);
-  }
-
-  return next_pwlcm(1.0 - current, exp);
-}
-
 inline const dvec2& pwlcm_generator2::next() {
-  current_.x = next_pwlcm(current_.x, exponent_);
-  current_.y = next_pwlcm(current_.y, exponent_);
+  current_.x = generator1_.next();
+  current_.y = generator2_.next();
   return current_;
 }
 
 inline const double & pwlcm_generator2::exponent() const {
-  return exponent_;
+  return generator1_.exponent();
 }
