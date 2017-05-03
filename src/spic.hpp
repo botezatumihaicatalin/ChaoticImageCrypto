@@ -74,7 +74,7 @@ inline uint32_t* spic<spectrum>::permutation_(uint32_t size, generator2* mapper)
 
     if (!found) {
       uint32_t j = max - 1;
-      for (; j >= 0 && has[j]; j--);
+      for (; j > 0 && has[j]; j--);
       max = j;
       perm[i++] = max , has[max] = true;
     }
@@ -101,10 +101,10 @@ inline uint8_t* spic<spectrum>::shuffle_(uint8_t* pixels, uint32_t size, generat
   }
 
   uint8_t* shuffled = new uint8_t[size];
-  uint32_t* permutation = permutation_(size / spectrum, mapper);
+  uint32_t* permutation = permutation_(size, mapper);
 
-  for (uint32_t i = 0; i < size / spectrum; i++) {
-    memcpy(&shuffled[permutation[i] * spectrum], &pixels[i * spectrum], pixel_size);
+  for (uint32_t idx = 0; idx < size; idx++) {
+    shuffled[permutation[idx]] = pixels[idx];
   }
 
   delete[] permutation;
@@ -120,11 +120,11 @@ inline uint8_t* spic<spectrum>::unshuffle_(uint8_t* pixels, uint32_t size, gener
 
   uint8_t* unshuffled = new uint8_t[size];
 
-  uint32_t* permutation = permutation_(size / spectrum, mapper);
-  uint32_t* inverse = inversate_(permutation, size / spectrum);
+  uint32_t* permutation = permutation_(size, mapper);
+  uint32_t* inverse = inversate_(permutation, size);
 
-  for (uint32_t i = 0; i < size / spectrum; i++) {
-    memcpy(&unshuffled[inverse[i] * spectrum], &pixels[i * spectrum], pixel_size);
+  for (uint32_t idx = 0; idx < size; idx++) {
+    unshuffled[inverse[idx]] = pixels[idx];
   }
 
   delete[] permutation , delete[] inverse;

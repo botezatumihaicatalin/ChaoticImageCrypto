@@ -22,14 +22,18 @@
     <ClInclude Include="src\dvec2.hpp" />
     <ClInclude Include="src\generator2.hpp" />
     <ClInclude Include="src\generator1.hpp" />
+    <ClInclude Include="src\pwlcm_generator1.hpp" />
     <ClInclude Include="src\pwlcm_generator2.hpp" />
     <ClInclude Include="src\pwlcm_spic.hpp" />
     <ClInclude Include="src\pwlcm_spic_key.hpp" />
+    <ClInclude Include="src\serpentine2_generator2.hpp" />
+    <ClInclude Include="src\serpentine2_spic.hpp" />
     <ClInclude Include="src\serpentine_generator2.hpp" />
     <ClInclude Include="src\serpentine_spic.hpp" />
     <ClInclude Include="src\serpentine_spic_key.hpp" />
     <ClInclude Include="src\spic.hpp" />
     <ClInclude Include="src\spic_key.hpp" />
+    <ClInclude Include="src\tmath.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ChaoticImageCrypto.cpp" />
@@ -102,7 +106,7 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>Full</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>None</DebugInformationFormat>
       <TreatWarningAsError>false</TreatWarningAsError>
@@ -111,6 +115,7 @@
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
