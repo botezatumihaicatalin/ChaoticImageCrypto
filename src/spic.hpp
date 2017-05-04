@@ -13,7 +13,7 @@ template <size_t spectrum> class spic {
 private:
   static size_t const pixel_size;
 
-  static uint32_t discretize(const double& value);
+  static uint32_t discretize_(const double& value);
 
   static uint32_t* permutation_(uint32_t size, generator2* mapper);
   static uint32_t* inversate_(uint32_t* permutation, uint32_t size);
@@ -40,7 +40,7 @@ template <size_t spectrum>
 size_t const spic<spectrum>::pixel_size = spectrum * sizeof(uint8_t);
 
 template <size_t spectrum>
-inline uint32_t spic<spectrum>::discretize(const double& value) {
+inline uint32_t spic<spectrum>::discretize_(const double& value) {
   static double TEN_TO_FIFTEEN = std::pow(10.0, 15);
   return std::abs(std::floor(TEN_TO_FIFTEEN * value));
 }
@@ -60,8 +60,8 @@ inline uint32_t* spic<spectrum>::permutation_(uint32_t size, generator2* mapper)
   while (i < size) {
     found = false;
 
-    aux_x = discretize(p.x) % size;
-    aux_y = discretize(p.y) % size;
+    aux_x = discretize_(p.x) % size;
+    aux_y = discretize_(p.y) % size;
 
     if (!has[aux_x]) {
       perm[i++] = aux_x , has[aux_x] = true;
@@ -101,10 +101,12 @@ inline uint8_t* spic<spectrum>::shuffle_(uint8_t* pixels, uint32_t size, generat
   }
 
   uint8_t* shuffled = new uint8_t[size];
-  uint32_t* permutation = permutation_(size, mapper);
+  uint32_t* permutation = permutation_(size / spectrum, mapper);
 
-  for (uint32_t idx = 0; idx < size; idx++) {
-    shuffled[permutation[idx]] = pixels[idx];
+  uint32_t s_idx = 0, p_idx = 0;
+  for (uint32_t idx = 0; idx < size / spectrum; idx++) {
+    s_idx = permutation[idx] * spectrum, p_idx = idx * spectrum;
+    memcpy(&shuffled[s_idx], &pixels[p_idx], pixel_size);
   }
 
   delete[] permutation;
@@ -120,11 +122,13 @@ inline uint8_t* spic<spectrum>::unshuffle_(uint8_t* pixels, uint32_t size, gener
 
   uint8_t* unshuffled = new uint8_t[size];
 
-  uint32_t* permutation = permutation_(size, mapper);
-  uint32_t* inverse = inversate_(permutation, size);
+  uint32_t* permutation = permutation_(size / spectrum, mapper);
+  uint32_t* inverse = inversate_(permutation, size / spectrum);
 
-  for (uint32_t idx = 0; idx < size; idx++) {
-    unshuffled[inverse[idx]] = pixels[idx];
+  uint32_t s_idx = 0, p_idx = 0;
+  for (uint32_t idx = 0; idx < size / spectrum; idx++) {
+    s_idx = inverse[idx] * spectrum, p_idx = idx * spectrum;
+    memcpy(&unshuffled[s_idx], &pixels[p_idx], pixel_size);
   }
 
   delete[] permutation , delete[] inverse;
@@ -141,8 +145,8 @@ inline uint8_t* spic<spectrum>::substitute_(uint8_t* pixels, uint32_t size, gene
   uint8_t* encrypted = new uint8_t[size];
 
   dvec2 p2 = mapper->current();
-  uint32_t ks1 = discretize(p2.x);
-  uint32_t ks2 = discretize(p2.y);
+  uint32_t ks1 = discretize_(p2.x);
+  uint32_t ks2 = discretize_(p2.y);
 
   uint32_t curr_pixel = 0;
   memcpy(&curr_pixel, &pixels[0], pixel_size);
@@ -154,21 +158,21 @@ inline uint8_t* spic<spectrum>::substitute_(uint8_t* pixels, uint32_t size, gene
 
   uint32_t channels = 0;
 
-  for (uint32_t i = spectrum; i < size; i += spectrum) {
+  for (uint32_t idx = spectrum; idx < size; idx += spectrum) {
     p2 = mapper->next();
 
-    ks1 = discretize(p2.x);
-    ks2 = discretize(p2.y);
+    ks1 = discretize_(p2.x);
+    ks2 = discretize_(p2.y);
 
     for (size_t c = 0; c < spectrum; c++) {
-      channels += encrypted[i - spectrum + c];
+      channels += encrypted[idx - spectrum + c];
     }
 
-    memcpy(&curr_pixel, &pixels[i], pixel_size);
+    memcpy(&curr_pixel, &pixels[idx], pixel_size);
     encr_pixel = ((curr_pixel ^ ks1) + channels) ^ prev_pixel ^ ks2;
     prev_pixel = encr_pixel;
 
-    memcpy(&encrypted[i], &encr_pixel, pixel_size);
+    memcpy(&encrypted[idx], &encr_pixel, pixel_size);
   }
 
   return encrypted;
@@ -183,8 +187,8 @@ inline uint8_t* spic<spectrum>::unsubstitute_(uint8_t* pixels, uint32_t size, ge
   uint8_t* decrypted = new uint8_t[size];
 
   dvec2 p2 = mapper->current();
-  uint32_t ks1 = discretize(p2.x);
-  uint32_t ks2 = discretize(p2.y);
+  uint32_t ks1 = discretize_(p2.x);
+  uint32_t ks2 = discretize_(p2.y);
 
   uint32_t curr_pixel = 0;
   memcpy(&curr_pixel, &pixels[0], pixel_size);
@@ -196,21 +200,21 @@ inline uint8_t* spic<spectrum>::unsubstitute_(uint8_t* pixels, uint32_t size, ge
 
   uint32_t channels = 0;
 
-  for (uint32_t i = spectrum; i < size; i += spectrum) {
+  for (uint32_t idx = spectrum; idx < size; idx += spectrum) {
     p2 = mapper->next();
 
-    ks1 = discretize(p2.x);
-    ks2 = discretize(p2.y);
+    ks1 = discretize_(p2.x);
+    ks2 = discretize_(p2.y);
 
     for (size_t c = 0; c < spectrum; c++) {
-      channels += pixels[i - spectrum + c];
+      channels += pixels[idx - spectrum + c];
     }
 
-    memcpy(&curr_pixel, &pixels[i], pixel_size);
+    memcpy(&curr_pixel, &pixels[idx], pixel_size);
     decr_pixel = ((prev_pixel ^ curr_pixel ^ ks2) - channels) ^ ks1;
     prev_pixel = curr_pixel;
 
-    memcpy(&decrypted[i], &decr_pixel, pixel_size);
+    memcpy(&decrypted[idx], &decr_pixel, pixel_size);
   }
 
   return decrypted;
