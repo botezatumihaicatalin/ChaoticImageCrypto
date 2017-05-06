@@ -2,6 +2,7 @@ import Jimp from 'jimp'
 import _ from 'lodash'
 import path from 'path'
 import { println } from './printing.js6'
+import pxutils from './pxutils.js6'
 
 function analyzeCipher(name, options) {
 
@@ -18,49 +19,6 @@ function analyzeCipher(name, options) {
 		return _.now() - start
 	}
 
-	const toRgbUint8Array = (array) => {
-		const size = array.length / 4
-		const output = new Uint8Array(size * 3)
-		for (let i = 0; i < size; i ++) {
-			for (let c = 0; c < 3; c ++) {
-				output[i*3+c] = array[i*4+c]
-			}
-		}
-		return output
-	}
-
-	const chiSquareTest = (pixels) => {
-		const expected = pixels.length / 256
-		const frequency = _.countBy(pixels, x => x)
-
-		let chiSquare = 0
-		
-		_.times(256, pixel => {
-			const pixelFreq = frequency[pixel] || 0
-			const deltaFreq = pixelFreq - expected
-			chiSquare += deltaFreq * deltaFreq
-		})
-
-		return chiSquare / expected
-	}
-
-	const globalEntropyTest = (pixels) => {
-		const frequency = _.countBy(pixels, x => x)
-
-		let entropy = 0
-
-		_.times(256, pixel => {
-			const pixelFreq = frequency[pixel] || 0
-			
-			if (pixelFreq > 0) {
-				const probability = 1.0 * pixelFreq / pixels.length
-				entropy -= probability * Math.log2(probability)
-			}
-		})
-
-		return entropy
-	}
-
 	const slightlyChangeKey = (cipherKey) => {
 		const keyFields = _.keysIn(cipherKey)
 		const fieldName = _.sample(keyFields)
@@ -73,27 +31,11 @@ function analyzeCipher(name, options) {
 		return clonedKey
 	}
 
-	const npcrTest = (pixels1, pixels2) => {
-		let sum = 0, len = pixels1.length
-		for (let i = 0; i < len; i ++) {
-			sum += +(pixels1[i] !== pixels2[i])
-		}
-		return `${(sum / len) * 100}%`
-	}
-
-	const uaciTest = (pixels1, pixels2) => {
-		let sum = 0, len = pixels1.length
-		for (let i = 0; i < len; i ++) {
-			sum += Math.abs(pixels1[i] - pixels2[i]) / 255
-		}
-		return `${(sum / len) * 100}%`
-	}
-
 	const testSourceQuality = (bitmap) => {
-		const pixels = toRgbUint8Array(bitmap.data)
+		const pixels = pxutils.toRgbUint8Array(bitmap.data)
 		return {
-			chiSquareValue: chiSquareTest(pixels),
-			globalEntropyValue: globalEntropyTest(pixels),
+			chiSquareValue: pxutils.chiSquareTest(pixels),
+			globalEntropyValue: pxutils.globalEntropyTest(pixels),
 			dimensions: [ bitmap.width, bitmap.height ]
 		}
 	}
@@ -101,8 +43,8 @@ function analyzeCipher(name, options) {
 	const testEncryptionQuality = (bitmap) => {
 		cipher.initKey(cipherKey)
 
-		const pixels1 = toRgbUint8Array(bitmap.data)
-		const pixels2 = toRgbUint8Array(bitmap.data)
+		const pixels1 = pxutils.toRgbUint8Array(bitmap.data)
+		const pixels2 = pxutils.toRgbUint8Array(bitmap.data)
 		const randIx = 3 * _.random(0, pixels2.length / 3)
 		pixels2[randIx] = (pixels2[randIx] + 128) % 256
 		pixels2[randIx+1] = (pixels2[randIx+1] + 128) % 256
@@ -115,10 +57,10 @@ function analyzeCipher(name, options) {
 		const encrypted2 = cipher.encrypt(pixels2)
 		
 		return {
-			chiSquareValue: chiSquareTest(encrypted1),
-			globalEntropyValue: globalEntropyTest(encrypted1),
-			npcrValue: npcrTest(encrypted1, encrypted2),
-			uaciValue: uaciTest(encrypted1, encrypted2),
+			chiSquareValue: pxutils.chiSquareTest(encrypted1),
+			globalEntropyValue: pxutils.globalEntropyTest(encrypted1),
+			npcrValue: pxutils.npcrValue(encrypted1, encrypted2),
+			uaciValue: pxutils.uaciValue(encrypted1, encrypted2),
 			duration: encryptDuration
 		}
 	}
@@ -127,11 +69,14 @@ function analyzeCipher(name, options) {
 		const cipherKey1 = cipherKey
 		const cipherKey2 = slightlyChangeKey(cipherKey1)
 		const cipherKey3 = slightlyChangeKey(cipherKey2)
-		const pixels = toRgbUint8Array(bitmap.data)
+		const pixels = pxutils.toRgbUint8Array(bitmap.data)
 
 		cipher.initKey(cipherKey1)
 		const encrypted = cipher.encrypt(pixels)
-		const decrypted1 = cipher.decrypt(encrypted)
+		let decrypted1 = null
+		const decryptDuration = timeOperation(() => {
+			decrypted1 = cipher.decrypt(encrypted)
+		}) 
 
 		cipher.initKey(cipherKey2)
 		const decrypted2 = cipher.decrypt(encrypted)
@@ -141,10 +86,9 @@ function analyzeCipher(name, options) {
 
 		return {
 			decryptCorrect: _.isEqual(pixels, decrypted1),
-			npcrValue: npcrTest(decrypted2, decrypted3)
+			npcrValue: pxutils.npcrValue(decrypted2, decrypted3),
+			duration: decryptDuration
 		}
-
-		// TO DO:
 	}
 
 	const printSourceQuality = (output) => {
@@ -167,6 +111,7 @@ function analyzeCipher(name, options) {
 
 	const printDecryptionQuality = (output, padding) => {
 		println(`Testing decryption quality`, 1, 'green')
+		println(`Decryption took ${output.duration} milliseconds`, 2, 'yellow')
 		println(`Decrypted is same as original image? ${output.decryptCorrect}`, 2, 'yellow')
 		println(`Number of Pixel Change Rate is: ${output.npcrValue}`, 2, 'yellow')
 		return true
