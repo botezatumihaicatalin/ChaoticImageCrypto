@@ -2,6 +2,7 @@
 
 #include <nan.h>
 #include "base_spic.hpp"
+#include "utils.hpp"
 #include "../src/pwlcm_spic.hpp"
 #include "../src/pwlcm_spic_key.hpp"
 
@@ -17,6 +18,7 @@ class PwlcmSpicCipher : public BaseSpicCipher<spectrum> {
 
     Nan::SetPrototypeMethod(tpl, "encrypt", Encrypt);
     Nan::SetPrototypeMethod(tpl, "decrypt", Decrypt);
+    Nan::SetPrototypeMethod(tpl, "initKey", InitKey);
 
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
     Nan::Set(target, Nan::New(class_name).ToLocalChecked(),
@@ -26,10 +28,7 @@ class PwlcmSpicCipher : public BaseSpicCipher<spectrum> {
  private:
   pwlcm_spic<spectrum> image_cipher_;
 
-  explicit PwlcmSpicCipher(): BaseSpicCipher(&image_cipher_) {
-    image_cipher_.init_key(pwlcm_spic_key(dvec2(0.1567, 0.3219), dvec2(0.4567, 0.1111),
-                                                0.2, 0.3, 2017, 2016, 123456));
-  }
+  explicit PwlcmSpicCipher(): BaseSpicCipher(&image_cipher_) {}
   virtual ~PwlcmSpicCipher() {}
 
   static NAN_METHOD(New) {
@@ -44,6 +43,38 @@ class PwlcmSpicCipher : public BaseSpicCipher<spectrum> {
       v8::Local<v8::Function> cons = Nan::New(constructor());
       info.GetReturnValue().Set(cons->NewInstance(argc, argv));
     }
+  }
+
+  static NAN_METHOD(InitKey) {
+    if (info.Length() < 1 || !info[0]->IsObject()) {
+      return Nan::ThrowError("Invalid arguments: Need one object");
+    }
+    double x1 = 0, y1 = 0, r1 = 0, x2 = 0, y2 = 0, r2 = 0;
+    uint32_t m1 = 0, m2 = 0, iv = 0;
+
+    v8::Local<v8::Object> object_arg = Nan::To<v8::Object>(info[0]).ToLocalChecked();
+    PwlcmSpicCipher* wrapped_obj = Nan::ObjectWrap::Unwrap<PwlcmSpicCipher>(info.Holder());
+
+    try {
+      // First generator params
+      x1 = GetNumberValue(object_arg, "x1"), y1 = GetNumberValue(object_arg, "y1");
+      r1 = GetNumberValue(object_arg, "r1"), m1 = GetUint32Value(object_arg, "m1");
+      
+      // Second generator params
+      x2 = GetNumberValue(object_arg, "x2"), y2 = GetNumberValue(object_arg, "y2");
+      r2 = GetNumberValue(object_arg, "r2"), m2 = GetUint32Value(object_arg, "m2");
+      
+      // Initialization value, used to spice up things.
+      iv = GetUint32Value(object_arg, "iv");
+
+      pwlcm_spic_key cipher_key(dvec2(x1, y1), dvec2(x2, y2), r1, r2, m1, m2, iv);
+      wrapped_obj->image_cipher_.init_key(cipher_key);
+    }
+    catch (std::exception& ex) {
+      return Nan::ThrowError(ex.what());
+    }
+
+    info.GetReturnValue().Set(info.Holder());
   }
 
   static inline Nan::Persistent<v8::Function>& constructor() {

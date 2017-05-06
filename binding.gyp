@@ -22,6 +22,16 @@
               "GCC_ENABLE_CPP_EXCEPTIONS": "YES"
             }
           }
+        ],
+        [
+          'OS=="win"',
+          {
+            "msvs_settings": {
+              "VCCLCompilerTool": {
+                "ExceptionHandling": 1
+              }
+            }
+          }
         ]
       ]
     }
