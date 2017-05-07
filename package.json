@@ -4,7 +4,8 @@
   "description": "Native implementation of image cryptography using chaotic math",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "setup-esformatter": "npm install esformatter esformatter-align esformatter-asi esformatter-braces esformatter-collapse-objects esformatter-dot-notation esformatter-flow esformatter-jsx esformatter-limit-linebreaks esformatter-literal-notation esformatter-parseint esformatter-quote-props esformatter-quotes esformatter-remove-trailing-commas esformatter-spaced-lined-comment esformatter-var-each",
+    "benchmark": "node ./node_modules/babel-cli/bin/babel-node.js --presets es2015 ./benchmarks/benchmark.js6"
   },
   "repository": {
     "type": "git",
@@ -20,9 +21,9 @@
     "nan": "^2.5.1"
   },
   "devDependencies": {
-    "babel-preset-es2015": "^6.24.1",
-    "babel-register": "^6.24.1",
+    "babel-cli": "^6.24.1",
     "cli-color": "^1.2.0",
+    "cli-table2": "^0.2.0",
     "jimp": "^0.2.27",
     "lodash": "^4.17.4"
   }

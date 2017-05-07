@@ -1,85 +1,85 @@
-import _ from 'lodash'
+import _ from "lodash"
 
 class PixelsUtils {
 
-	chiSquareTest(pixels) {
-		const expected = _.size(pixels) / 256
-		const frequency = _.countBy(pixels)
+  chiSquareTest(pixels) {
+    const expected  = _.size(pixels) / 256
+    const frequency = _.countBy(pixels)
 
-		let chiSquare = 0
-		for (let pixel = 0; pixel < 256; pixel ++) {
-			const pixelFreq = frequency[pixel] || 0
-			const deltaFreq = pixelFreq - expected
-			chiSquare += deltaFreq * deltaFreq
-		}
-		return chiSquare / expected
-	}
+    let chiSquare = 0
+    for (let pixel = 0; pixel < 256; pixel++) {
+      const pixelFreq = frequency[pixel] || 0
+      const deltaFreq = pixelFreq - expected
+      chiSquare += deltaFreq * deltaFreq
+    }
+    return chiSquare / expected
+  }
 
-	globalEntropyTest(pixels) {
-		const pixelsSize = _.size(pixels)
-		const frequency = _.countBy(pixels)
+  globalEntropyTest(pixels) {
+    const pixelsSize = _.size(pixels)
+    const frequency  = _.countBy(pixels)
 
-		let entropy = 0
-		for (let pixel = 0; pixel < 256; pixel ++) {
-			const pixelFreq = frequency[pixel] || 0
-			
-			if (pixelFreq > 0) {
-				const probability = 1.0 * pixelFreq / pixelsSize
-				entropy -= probability * Math.log2(probability)
-			}
-		}
-		return entropy
-	}
+    let entropy = 0
+    for (let pixel = 0; pixel < 256; pixel++) {
+      const pixelFreq = frequency[pixel] || 0
 
-	npcrValue(pixels1, pixels2) {
-		if (!_.isArrayLikeObject(pixels1) 
-		 || !_.isArrayLikeObject(pixels2)) {
-			return '0%'
-		}
-		const pixelsSize = _.size(pixels1)
-		if (pixelsSize !== _.size(pixels2)) {
-			return '0%'
-		}
+      if (pixelFreq > 0) {
+        const probability = 1.0 * pixelFreq / pixelsSize
+        entropy -= probability * Math.log2(probability)
+      }
+    }
+    return entropy
+  }
 
-		let sum = 0
-		_.forEach(pixels1, (value, idx) => {
-			sum += +(value !== pixels2[idx])
-		})
-		return `${(sum / pixelsSize) * 100}%`
-	}
+  npcrPercentage(pixels1, pixels2) {
+    if (!_.isArrayLikeObject(pixels1)
+      || !_.isArrayLikeObject(pixels2)) {
+      return 0
+    }
+    const pixelsSize = _.size(pixels1)
+    if (pixelsSize !== _.size(pixels2)) {
+      return 0
+    }
 
-	uaciValue(pixels1, pixels2) {
-		if (!_.isArrayLikeObject(pixels1) 
-		 || !_.isArrayLikeObject(pixels2)) {
-			return '0%'
-		}
-		const pixelsSize = _.size(pixels1)
-		if (pixelsSize !== _.size(pixels2)) {
-			return '0%'
-		}
+    let sum = 0
+    _.forEach(pixels1, (value, idx) => {
+      sum += +(value !== pixels2[idx])
+    })
+    return sum / pixelsSize * 100
+  }
 
-		let sum = 0
-		_.forEach(pixels1, (value, idx) => {
-			sum += Math.abs(value - pixels2[idx]) / 255
-		})
-		return `${(sum / pixelsSize) * 100}%`
-	}
+  uaciPercentage(pixels1, pixels2) {
+    if (!_.isArrayLikeObject(pixels1)
+      || !_.isArrayLikeObject(pixels2)) {
+      return 0
+    }
+    const pixelsSize = _.size(pixels1)
+    if (pixelsSize !== _.size(pixels2)) {
+      return 0
+    }
 
-	toRgbUint8Array(pixels) {
-		if (!_.isArrayLikeObject(pixels)) {
-			return new Uint8Array(0)
-		}
-		const pixelsSize = _.size(pixels)
-		const imageSize = Math.floor(pixelsSize/4)
-		
-		const outputPixels = new Uint8Array(imageSize*3)
-		for (let idx = 0; idx < imageSize; idx ++) {
-			for (let chan = 0; chan < 3; chan ++) {
-				outputPixels[idx*3+chan] = pixels[idx*4+chan]
-			}
-		}
-		return outputPixels
-	}
+    let sum = 0
+    _.forEach(pixels1, (value, idx) => {
+      sum += Math.abs(value - pixels2[idx]) / 255
+    })
+    return sum / pixelsSize * 100
+  }
+
+  toRgbUint8Array(pixels) {
+    if (!_.isArrayLikeObject(pixels)) {
+      return new Uint8Array(0)
+    }
+    const pixelsSize = _.size(pixels)
+    const imageSize  = Math.floor(pixelsSize / 4)
+
+    const outputPixels = new Uint8Array(imageSize * 3)
+    for (let idx = 0; idx < imageSize; idx++) {
+      for (let chan = 0; chan < 3; chan++) {
+        outputPixels[idx * 3 + chan] = pixels[idx * 4 + chan]
+      }
+    }
+    return outputPixels
+  }
 
 }
 
