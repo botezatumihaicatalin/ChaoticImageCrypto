@@ -1,9 +1,9 @@
-import _ from 'lodash'
-import path from 'path'
-import fs from 'fs'
+import _ from "lodash"
+import path from "path"
+import fs from "fs"
 
-const folderPath = path.join(__dirname, 'test-images')
-const fileNames = fs.readdirSync(folderPath)
-const filePaths = _.map(fileNames, name => path.join(folderPath, name))
+const folderPath = path.join(__dirname, "test-images")
+const imageNames = fs.readdirSync(folderPath)
+const imagePaths = _.map(imageNames, name => path.join(folderPath, name))
 
-export default filePaths
+export default imagePaths

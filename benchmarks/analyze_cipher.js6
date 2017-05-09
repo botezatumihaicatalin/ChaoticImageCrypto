@@ -24,13 +24,18 @@ function analyzeCipher(name, options) {
     return _.now() - start
   }
 
+  let fieldIdx = 0
   const slightlyChangeKey = (cipherKey) => {
     const keyFields  = _.keysIn(cipherKey)
-    const fieldName  = _.sample(keyFields)
+    
+    const fieldName  = keyFields[fieldIdx]
     const fieldValue = cipherKey[fieldName]
     const clonedKey  = _.clone(cipherKey)
+
     clonedKey[fieldName] = _.isInteger(fieldValue)
       ? (fieldValue + 1) : (fieldValue + Math.pow(10, -15))
+
+    fieldIdx = (fieldIdx + 1) % keyFields.length
 
     return clonedKey
   }
@@ -76,7 +81,7 @@ function analyzeCipher(name, options) {
   const testDecryptionQuality = (bitmap) => {
     const cipherKey1 = cipherKey
     const cipherKey2 = slightlyChangeKey(cipherKey1)
-    const cipherKey3 = slightlyChangeKey(cipherKey2)
+    const cipherKey3 = slightlyChangeKey(cipherKey1)
     const pixels     = pxutils.toRgbUint8Array(bitmap.data)
 
     cipher.initKey(cipherKey1)
@@ -94,7 +99,8 @@ function analyzeCipher(name, options) {
 
     return {
       decryptionSuccess: _.isEqual(pixels, decrypted1),
-      npcrPercentage:    pxutils.npcrPercentage(decrypted2, decrypted3),
+      npcrPercentage1:   pxutils.npcrPercentage(pixels, decrypted2),
+      npcrPercentage2:   pxutils.npcrPercentage(decrypted2, decrypted3),
       duration:          decryptDuration
     }
   }
@@ -123,7 +129,12 @@ function analyzeCipher(name, options) {
     asciiTable.push(
       [
         {
-          colSpan: 4,
+          content: '#',
+          rowSpan: 2,
+          vAlign:  "center"
+        },
+        {
+          colSpan: 3,
           content: "Source Quality",
           hAlign:  "center"
         },
@@ -142,17 +153,16 @@ function analyzeCipher(name, options) {
 
     asciiTable.push(
       [
-        "#",
         "Chi square",
         "Global entropy",
         "Dimensions",
         "Chi square",
         "Global entropy",
-        "NPCR",
-        "UACI",
+        "NPCR (%)",
+        "UACI (%)",
         "Duration",
-        "Works",
-        "NPCR",
+        "Decryted?",
+        "NPCR (%)",
         "Duration"
       ]
     )
@@ -171,8 +181,8 @@ function analyzeCipher(name, options) {
           encryption.npcrPercentage.toFixed(6) + "%",
           encryption.uaciPercentage.toFixed(6) + "%",
           encryption.duration + " ms",
-          decryption.decryptionSuccess,
-          decryption.npcrPercentage.toFixed(6) + "%",
+          decryption.decryptionSuccess ? 'success' : 'failed',
+          decryption.npcrPercentage2.toFixed(6) + "%",
           decryption.duration + " ms"
         ]
       )
