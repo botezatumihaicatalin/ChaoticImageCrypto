@@ -1,34 +1,38 @@
 {
-  "targets": [
+  "targets":[
     {
-      "target_name": "cryptography",
-      "sources": [
+      "target_name":"cryptography",
+      "sources":[
         "./native/cryptography.cxx"
       ],
-      "include_dirs": [
+      "include_dirs":[
         "<!(node -e \"require('nan')\")"
       ],
-      "cflags!": [
+      "cflags!":[
         "-fno-exceptions"
       ],
-      "cflags_cc!": [
+      "cflags_cc!":[
         "-fno-exceptions"
       ],
-      "conditions": [
+      "conditions":[
         [
           "OS==\"mac\"",
           {
-            "xcode_settings": {
-              "GCC_ENABLE_CPP_EXCEPTIONS": "YES"
+            "xcode_settings":{
+              "GCC_ENABLE_CPP_EXCEPTIONS":"YES",
+              "OTHER_CPLUSPLUSFLAGS":[
+                "-std=c++11",
+                "-stdlib=libc++"
+              ]
             }
           }
         ],
         [
-          'OS=="win"',
+          "OS==\"win\"",
           {
-            "msvs_settings": {
-              "VCCLCompilerTool": {
-                "ExceptionHandling": 1
+            "msvs_settings":{
+              "VCCLCompilerTool":{
+                "ExceptionHandling":1
               }
             }
           }

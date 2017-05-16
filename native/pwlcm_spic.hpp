@@ -1,8 +1,11 @@
 #pragma once
 
 #include <nan.h>
-#include "base_spic.hpp"
-#include "utils.hpp"
+#include <string>
+
+#include "./base_spic.hpp"
+#include "./utils.hpp"
+
 #include "../src/pwlcm_spic.hpp"
 #include "../src/pwlcm_spic_key.hpp"
 
@@ -16,9 +19,9 @@ class PwlcmSpicCipher : public BaseSpicCipher<spectrum> {
     tpl->SetClassName(Nan::New(class_name).ToLocalChecked());
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
-    Nan::SetPrototypeMethod(tpl, "encrypt", Encrypt);
-    Nan::SetPrototypeMethod(tpl, "decrypt", Decrypt);
-    Nan::SetPrototypeMethod(tpl, "initKey", InitKey);
+    Nan::SetPrototypeMethod(tpl, "encrypt", PwlcmSpicCipher<spectrum>::Encrypt);
+    Nan::SetPrototypeMethod(tpl, "decrypt", PwlcmSpicCipher<spectrum>::Decrypt);
+    Nan::SetPrototypeMethod(tpl, "initKey", PwlcmSpicCipher<spectrum>::InitKey);
 
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
     Nan::Set(target, Nan::New(class_name).ToLocalChecked(),
@@ -28,15 +31,14 @@ class PwlcmSpicCipher : public BaseSpicCipher<spectrum> {
  private:
   pwlcm_spic<spectrum> image_cipher_;
 
-  explicit PwlcmSpicCipher(): BaseSpicCipher(&image_cipher_) {}
-  virtual ~PwlcmSpicCipher() {}
+  explicit PwlcmSpicCipher(): BaseSpicCipher<spectrum>(&image_cipher_) {}
 
   static NAN_METHOD(New) {
     if (info.IsConstructCall()) {
       PwlcmSpicCipher *obj = new PwlcmSpicCipher();
       obj->Wrap(info.This());
       info.GetReturnValue().Set(info.This());
-    } 
+    }
     else {
       const int argc = 1;
       v8::Local<v8::Value> argv[argc] = {info[0]};
@@ -59,11 +61,11 @@ class PwlcmSpicCipher : public BaseSpicCipher<spectrum> {
       // First generator params
       x1 = GetNumberValue(object_arg, "x1"), y1 = GetNumberValue(object_arg, "y1");
       r1 = GetNumberValue(object_arg, "r1"), m1 = GetUint32Value(object_arg, "m1");
-      
+
       // Second generator params
       x2 = GetNumberValue(object_arg, "x2"), y2 = GetNumberValue(object_arg, "y2");
       r2 = GetNumberValue(object_arg, "r2"), m2 = GetUint32Value(object_arg, "m2");
-      
+
       // Initialization value, used to spice up things.
       iv = GetUint32Value(object_arg, "iv");
 

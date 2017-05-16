@@ -1,8 +1,11 @@
 #pragma once
 
 #include <nan.h>
-#include "base_spic.hpp"
-#include "utils.hpp"
+#include <string>
+
+#include "./base_spic.hpp"
+#include "./utils.hpp"
+
 #include "../src/serpentine2_spic.hpp"
 #include "../src/serpentine_spic_key.hpp"
 
@@ -16,9 +19,9 @@ public:
     tpl->SetClassName(Nan::New(class_name).ToLocalChecked());
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
-    Nan::SetPrototypeMethod(tpl, "encrypt", Encrypt);
-    Nan::SetPrototypeMethod(tpl, "decrypt", Decrypt);
-    Nan::SetPrototypeMethod(tpl, "initKey", InitKey);
+    Nan::SetPrototypeMethod(tpl, "encrypt", Serpentine2SpicCipher<spectrum>::Encrypt);
+    Nan::SetPrototypeMethod(tpl, "decrypt", Serpentine2SpicCipher<spectrum>::Decrypt);
+    Nan::SetPrototypeMethod(tpl, "initKey", Serpentine2SpicCipher<spectrum>::InitKey);
 
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
     Nan::Set(target, Nan::New(class_name).ToLocalChecked(),
@@ -28,8 +31,7 @@ public:
 private:
   serpentine2_spic<spectrum> image_cipher_;
 
-  explicit Serpentine2SpicCipher() : BaseSpicCipher(&image_cipher_) {}
-  virtual ~Serpentine2SpicCipher() {}
+  explicit Serpentine2SpicCipher() : BaseSpicCipher<spectrum>(&image_cipher_) {}
 
   static NAN_METHOD(New) {
     if (info.IsConstructCall()) {
@@ -59,11 +61,11 @@ private:
       // First generator params
       x1 = GetNumberValue(object_arg, "x1"), y1 = GetNumberValue(object_arg, "y1");
       r1 = GetNumberValue(object_arg, "r1"), m1 = GetUint32Value(object_arg, "m1");
-      
+
       // Second generator params
       x2 = GetNumberValue(object_arg, "x2"), y2 = GetNumberValue(object_arg, "y2");
       r2 = GetNumberValue(object_arg, "r2"), m2 = GetUint32Value(object_arg, "m2");
-      
+
       // Initialization value, used to spice up things.
       iv = GetUint32Value(object_arg, "iv");
 
