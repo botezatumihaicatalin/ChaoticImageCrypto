@@ -2,32 +2,34 @@ import crypto from '../lib/bindings.js'
 import analyzeCipher from './analyze_cipher.js6'
 import imagesPaths from './test_images.js6'
 
-(async function() {
-	await analyzeCipher('Spic cryptosystem with Pwlcm generator', {
-		images: imagesPaths, 
-		cipher: new crypto.PwlcmSpicCipher4(),
+analyzeCipher('Spic cryptosystem with Pwlcm generator', {
+	images: imagesPaths,
+	cipher: new crypto.PwlcmSpicCipher3(),
+	cipherKey: {
+		x1: 0.1567, y1: 0.3219, r1: 0.2, m1: 2015,
+  		x2: 0.4567, y2: 0.1111, r2: 0.3, m2: 2016,
+  		iv: 123456
+	}
+})
+.then(() => {
+    return analyzeCipher('Spic cryptosystem + Serpentine generator', {
+		images: imagesPaths,
+		cipher: new crypto.SerpentineSpicCipher3(),
 		cipherKey: {
-			x1: 0.1567, y1: 0.3219, r1: 0.2, m1: 2015,
-		  x2: 0.4567, y2: 0.1111, r2: 0.3, m2: 2016, 
-		  iv: 123456
-		}
-	})
-	await analyzeCipher('Spic cryptosystem + Serpentine generator', {
-		images: imagesPaths, 
-		cipher: new crypto.Serpentine2SpicCipher3(),
-		cipherKey: { 
 			x1: Math.PI / 4.0, y1: -Math.PI / 4.0, r1: 10, m1: 2016,
 			x2: 1.0 / 4.0, y2: -1 / 20.0, r2: 20, m2: 2017,
 			iv: 123456
 		}
 	})
-	await analyzeCipher('Spic cryptosystem + Serpentine generator + Luts math', {
-		images: imagesPaths, 
+})
+.then(() => {
+	return analyzeCipher('Spic cryptosystem + Serpentine generator + Luts math', {
+		images: imagesPaths,
 		cipher: new crypto.Serpentine2SpicCipher3(),
-		cipherKey: { 
+		cipherKey: {
 			x1: Math.PI / 4.0, y1: -Math.PI / 4.0, r1: 10, m1: 2016,
 			x2: 1.0 / 4.0, y2: -1 / 20.0, r2: 20, m2: 2017,
 			iv: 123456
 		}
 	})
-})()
+})
