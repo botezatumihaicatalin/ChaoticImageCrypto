@@ -2,7 +2,7 @@
 
 #include <cmath>
 #include "generator2.hpp"
-#include "tmath.hpp"
+#include "luts_math.hpp"
 
 // Same as serpentine_generator2, but with LUTS
 class serpentine2_generator2 : public generator2 {
@@ -25,8 +25,8 @@ public:
 inline const dvec2& serpentine2_generator2::next() {
   const double exp_x = pow_2_exponent_ * current_.x;
   const double exp_y = pow_2_exponent_ * current_.y;
-  current_.x = std::atan(1.0 / ttan(exp_x));
-  current_.y = tsin(exp_y) * tcos(exp_y);
+  current_.x = std::atan(1.0 / lmath::tan(exp_x));
+  current_.y = lmath::sin(exp_y) * lmath::cos(exp_y);
   return current_;
 }
 
