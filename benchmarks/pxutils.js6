@@ -2,67 +2,86 @@ import _ from "lodash"
 
 class PixelsUtils {
 
-  chiSquareTest(pixels) {
-    const expected  = _.size(pixels) / 256
-    const frequency = _.countBy(pixels)
+  chiSquareTest(pixels, spectrum = 3) {
+    const frequencies = _.times(spectrum, () => {
+      return _.times(256, () => 0)
+    })
+    _.forEach(pixels, (value, idx) => {
+      frequencies[idx % spectrum][value]++
+    })
 
-    let chiSquare = 0
-    for (let pixel = 0; pixel < 256; pixel++) {
-      const pixelFreq = frequency[pixel] || 0
-      const deltaFreq = pixelFreq - expected
-      chiSquare += deltaFreq * deltaFreq
-    }
-    return chiSquare / expected
-  }
+    const expected   = _.size(pixels) / 256 / spectrum
+    const chiSquares = _.times(spectrum, () => 0)
 
-  globalEntropyTest(pixels) {
-    const pixelsSize = _.size(pixels)
-    const frequency  = _.countBy(pixels)
-
-    let entropy = 0
-    for (let pixel = 0; pixel < 256; pixel++) {
-      const pixelFreq = frequency[pixel] || 0
-
-      if (pixelFreq > 0) {
-        const probability = 1.0 * pixelFreq / pixelsSize
-        entropy -= probability * Math.log2(probability)
+    for (let chan = 0; chan < spectrum; chan++) {
+      for (let pixel = 0; pixel < 256; pixel++) {
+        const pixelFreq = frequencies[chan][pixel] || 0
+        const deltaFreq = pixelFreq - expected
+        chiSquares[chan] += deltaFreq * deltaFreq
       }
     }
-    return entropy
+
+    for (let chan = 0; chan < spectrum; chan++) {
+      chiSquares[chan] /= expected
+    }
+
+    return _.mean(chiSquares)
   }
 
-  npcrPercentage(pixels1, pixels2) {
+  globalEntropyTest(pixels, spectrum = 3) {
+    const frequencies = _.times(spectrum, () => {
+      return _.times(256, () => 0)
+    })
+    _.forEach(pixels, (value, idx) => {
+      frequencies[idx % spectrum][value]++
+    })
+
+    const imageSize = _.size(pixels) / spectrum
+    const entropies = _.times(spectrum, () => 0)
+
+    for (let chan = 0; chan < spectrum; chan++) {
+      for (let pixel = 0; pixel < 256; pixel++) {
+        const pixelFrequency = frequencies[chan][pixel]
+        if (pixelFrequency > 0) {
+          const probability = 1.0 * pixelFrequency / imageSize
+          entropies[chan] -= probability * Math.log2(probability)
+        }
+      }
+    }
+
+    return _.mean(entropies)
+  }
+
+  npcrPercentage(pixels1, pixels2, spectrum = 3) {
     if (!_.isArrayLikeObject(pixels1)
       || !_.isArrayLikeObject(pixels2)) {
       return 0
     }
-    const pixelsSize = _.size(pixels1)
-    if (pixelsSize !== _.size(pixels2)) {
-      return 0
-    }
 
-    let sum = 0
+    const sums      = _.times(spectrum, () => 0)
+    const imageSize = _.size(pixels1) / spectrum
+
     _.forEach(pixels1, (value, idx) => {
-      sum += +(value !== pixels2[idx])
+      sums[idx % spectrum] += +(value !== pixels2[idx])
     })
-    return sum / pixelsSize * 100
+
+    return _.mean(sums) / imageSize * 100
   }
 
-  uaciPercentage(pixels1, pixels2) {
+  uaciPercentage(pixels1, pixels2, spectrum = 3) {
     if (!_.isArrayLikeObject(pixels1)
       || !_.isArrayLikeObject(pixels2)) {
       return 0
     }
-    const pixelsSize = _.size(pixels1)
-    if (pixelsSize !== _.size(pixels2)) {
-      return 0
-    }
 
-    let sum = 0
+    const sums      = _.times(spectrum, () => 0)
+    const imageSize = _.size(pixels1) / spectrum
+
     _.forEach(pixels1, (value, idx) => {
-      sum += Math.abs(value - pixels2[idx]) / 255
+      sums[idx % spectrum] += Math.abs(value - pixels2[idx]) / 255
     })
-    return sum / pixelsSize * 100
+
+    return _.mean(sums) / imageSize * 100
   }
 
   toRgbUint8Array(pixels) {

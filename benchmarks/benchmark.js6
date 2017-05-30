@@ -7,12 +7,12 @@ analyzeCipher('Spic cryptosystem with Pwlcm generator', {
 	cipher: new crypto.PwlcmSpicCipher3(),
 	cipherKey: {
 		x1: 0.1567, y1: 0.3219, r1: 0.2, m1: 2015,
-  		x2: 0.4567, y2: 0.1111, r2: 0.3, m2: 2016,
-  		iv: 123456
+		x2: 0.4567, y2: 0.1111, r2: 0.3, m2: 2016,
+		iv: 123456
 	}
 })
 .then(() => {
-    return analyzeCipher('Spic cryptosystem + Serpentine generator', {
+	return analyzeCipher('Spic cryptosystem + Serpentine generator', {
 		images: imagesPaths,
 		cipher: new crypto.SerpentineSpicCipher3(),
 		cipherKey: {
