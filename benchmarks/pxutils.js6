@@ -84,6 +84,22 @@ class PixelsUtils {
     return _.mean(sums) / imageSize * 100
   }
 
+  msePercentage(pixels1, pixels2, spectrum = 3) {
+    if (!_.isArrayLikeObject(pixels1)
+      || !_.isArrayLikeObject(pixels2)) {
+      return 0
+    }
+
+    const sums      = _.times(spectrum, () => 0)
+    const imageSize = _.size(pixels1) / spectrum
+
+    _.forEach(pixels1, (value, idx) => {
+      sums[idx % spectrum] += Math.pow(value - pixels2[idx], 2)
+    })
+
+    return _.mean(sums) / imageSize * 100
+  } 
+
   toRgbUint8Array(pixels) {
     if (!_.isArrayLikeObject(pixels)) {
       return new Uint8Array(0)

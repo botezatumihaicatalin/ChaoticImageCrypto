@@ -98,7 +98,7 @@ function analyzeCipher(name, options) {
     const decrypted3 = cipher.decrypt(encrypted)
 
     return {
-      decryptionSuccess: _.isEqual(pixels, decrypted1),
+      msePercentage:     pxutils.msePercentage(pixels, decrypted1),
       npcrPercentage1:   pxutils.npcrPercentage(pixels, decrypted2),
       npcrPercentage2:   pxutils.npcrPercentage(decrypted2, decrypted3),
       duration:          decryptDuration
@@ -161,7 +161,7 @@ function analyzeCipher(name, options) {
         "NPCR (%)",
         "UACI (%)",
         "Duration",
-        "Decryted?",
+        "MSE (%)",
         "NPCR (%)",
         "Duration"
       ]
@@ -181,7 +181,7 @@ function analyzeCipher(name, options) {
           encryption.npcrPercentage.toFixed(6) + "%",
           encryption.uaciPercentage.toFixed(6) + "%",
           encryption.duration + " ms",
-          decryption.decryptionSuccess ? 'success' : 'failed',
+          decryption.msePercentage.toFixed(6) + "%",
           decryption.npcrPercentage2.toFixed(6) + "%",
           decryption.duration + " ms"
         ]
