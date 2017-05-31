@@ -8,8 +8,7 @@
 #include "generator2.hpp"
 #include "spic_key.hpp"
 
-template <size_t spectrum>
-class spic {
+template <size_t spectrum> class spic {
 
 private:
   static size_t const pixel_size;
@@ -177,7 +176,7 @@ inline uint8_t* spic<spectrum>::unsubstitute_(uint8_t* pixels, uint32_t size, ge
   uint8_t* decrypted = new uint8_t[size];
 
   // Declarations
-  uint32_t channels = 0, ks1 = 0, ks2 = 0, aux = iv;
+  uint32_t channels = 0, ks1 = 0, ks2 = 0;
   uint8_t *ks1_pixel, *ks2_pixel;
   uint8_t* aux_pixel = reinterpret_cast<uint8_t*>(&iv);
 
