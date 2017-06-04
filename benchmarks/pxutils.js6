@@ -52,6 +52,22 @@ class PixelsUtils {
     return _.mean(entropies)
   }
 
+  mseTest(pixels1, pixels2, spectrum = 3) {
+    if (!_.isArrayLikeObject(pixels1)
+      || !_.isArrayLikeObject(pixels2)) {
+      return 0
+    }
+
+    const sums      = _.times(spectrum, () => 0)
+    const imageSize = _.size(pixels1) / spectrum
+
+    _.forEach(pixels1, (value, idx) => {
+      sums[idx % spectrum] += Math.pow(value - pixels2[idx], 2)
+    })
+
+    return _.mean(sums) / imageSize
+  }
+
   npcrPercentage(pixels1, pixels2, spectrum = 3) {
     if (!_.isArrayLikeObject(pixels1)
       || !_.isArrayLikeObject(pixels2)) {
@@ -84,34 +100,31 @@ class PixelsUtils {
     return _.mean(sums) / imageSize * 100
   }
 
-  msePercentage(pixels1, pixels2, spectrum = 3) {
-    if (!_.isArrayLikeObject(pixels1)
-      || !_.isArrayLikeObject(pixels2)) {
-      return 0
-    }
-
-    const sums      = _.times(spectrum, () => 0)
-    const imageSize = _.size(pixels1) / spectrum
-
-    _.forEach(pixels1, (value, idx) => {
-      sums[idx % spectrum] += Math.pow(value - pixels2[idx], 2)
-    })
-
-    return _.mean(sums) / imageSize * 100
-  } 
-
   toRgbUint8Array(pixels) {
     if (!_.isArrayLikeObject(pixels)) {
       return new Uint8Array(0)
     }
-    const pixelsSize = _.size(pixels)
-    const imageSize  = Math.floor(pixelsSize / 4)
-
+    const imageSize    = Math.floor(pixels.length / 4)
     const outputPixels = new Uint8Array(imageSize * 3)
     for (let idx = 0; idx < imageSize; idx++) {
       for (let chan = 0; chan < 3; chan++) {
         outputPixels[idx * 3 + chan] = pixels[idx * 4 + chan]
       }
+    }
+    return outputPixels
+  }
+
+  toRgbaUint8ClampedArray(pixels) {
+    if (!_.isArrayLikeObject(pixels)) {
+      return new Uint8Array(0)
+    }
+    const imageSize    = Math.floor(pixels.length / 3)
+    const outputPixels = new Uint8ClampedArray(imageSize * 4)
+    for (let idx = 0; idx < imageSize; idx++) {
+      for (let chan = 0; chan < 3; chan++) {
+        outputPixels[idx * 4 + chan] = pixels[idx * 3 + chan]
+      }
+      outputPixels[idx * 4 + 3] = 255
     }
     return outputPixels
   }

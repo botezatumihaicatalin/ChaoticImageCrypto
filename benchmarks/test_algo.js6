@@ -1,0 +1,49 @@
+import crypto from "../lib/bindings.js"
+import Jimp from "jimp"
+import pxutils from "./pxutils.js6"
+import path from "path"
+import fs from "fs"
+
+const imageName = "Lenna"
+
+const imagePath = path.join(__dirname, "test-images", `${imageName}.bmp`)
+const encrPath  = path.join(__dirname, "..", "build", `${imageName}-encrypted.bmp`)
+const decrPath  = path.join(__dirname, "..", "build", `${imageName}-decrypted.bmp`)
+
+const cipher = new crypto.SerpentineSpicCipher3()
+cipher.initKey({
+  x1: 0.071318255188198,
+  y1: -0.293732457746224,
+  r1: 12.340868182326869,
+  m1: 2016,
+  x2: -1.103375811168271,
+  y2: 0.195222060357971,
+  r2: 8.547941589157084,
+  m2: 2017,
+  iv: 123456
+})
+
+function promisify(fn, context, ...args) {
+  return new Promise((resolve, reject) => {
+    fn.call(context, ...args, (err, result) => {
+      err ? reject(err) : resolve(result)
+    })
+  })
+}
+
+Jimp.read(imagePath)
+  .then((image) => {
+    const pixelsRgb     = pxutils.toRgbUint8Array(image.bitmap.data)
+    const encryptedRgb  = cipher.encrypt(pixelsRgb)
+    const encryptedRgba = pxutils.toRgbaUint8ClampedArray(encryptedRgb)
+    image.bitmap.data = Buffer.from(encryptedRgba.buffer)
+    return promisify(image.write, image, encrPath)
+  })
+  .then(() => Jimp.read(encrPath))
+  .then((image) => {
+    const pixelsRgb     = pxutils.toRgbUint8Array(image.bitmap.data)
+    const decryptedRgb  = cipher.decrypt(pixelsRgb)
+    const decryptedRgba = pxutils.toRgbaUint8ClampedArray(decryptedRgb)
+    image.bitmap.data = Buffer.from(decryptedRgba.buffer)
+    return promisify(image.write, image, decrPath)
+  })

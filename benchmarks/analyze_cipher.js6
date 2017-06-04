@@ -24,10 +24,10 @@ function analyzeCipher(name, options) {
     return _.now() - start
   }
 
-  let fieldIdx = 0
+  let fieldIdx            = 0
   const slightlyChangeKey = (cipherKey) => {
-    const keyFields  = _.keysIn(cipherKey)
-    
+    const keyFields = _.keysIn(cipherKey)
+
     const fieldName  = keyFields[fieldIdx]
     const fieldValue = cipherKey[fieldName]
     const clonedKey  = _.clone(cipherKey)
@@ -58,7 +58,7 @@ function analyzeCipher(name, options) {
 
     const pixels1 = pxutils.toRgbUint8Array(bitmap.data)
     const pixels2 = pxutils.toRgbUint8Array(bitmap.data)
-    const randIx  = 3 * _.random(0, pixels2.length / 3)
+    const randIx  = pixels1.length - 4
     pixels2[randIx]     = (pixels2[randIx] + 128) % 256
     pixels2[randIx + 1] = (pixels2[randIx + 1] + 128) % 256
     pixels2[randIx + 2] = (pixels2[randIx + 2] + 128) % 256
@@ -98,10 +98,11 @@ function analyzeCipher(name, options) {
     const decrypted3 = cipher.decrypt(encrypted)
 
     return {
-      msePercentage:     pxutils.msePercentage(pixels, decrypted1),
-      npcrPercentage1:   pxutils.npcrPercentage(pixels, decrypted2),
-      npcrPercentage2:   pxutils.npcrPercentage(decrypted2, decrypted3),
-      duration:          decryptDuration
+      mseValue:        pxutils.mseTest(pixels, decrypted1),
+      npcrPercentage1: pxutils.npcrPercentage(pixels, decrypted2),
+      npcrPercentage2: pxutils.npcrPercentage(decrypted2, decrypted3),
+      mseValue2:       pxutils.mseTest(decrypted2, decrypted3),
+      duration:        decryptDuration
     }
   }
 
@@ -129,7 +130,7 @@ function analyzeCipher(name, options) {
     asciiTable.push(
       [
         {
-          content: '#',
+          content: "#",
           rowSpan: 2,
           vAlign:  "center"
         },
@@ -161,8 +162,8 @@ function analyzeCipher(name, options) {
         "NPCR (%)",
         "UACI (%)",
         "Duration",
-        "MSE (%)",
-        "NPCR (%)",
+        "MSE Decr",
+        "MSE Key",
         "Duration"
       ]
     )
@@ -181,8 +182,8 @@ function analyzeCipher(name, options) {
           encryption.npcrPercentage.toFixed(6) + "%",
           encryption.uaciPercentage.toFixed(6) + "%",
           encryption.duration + " ms",
-          decryption.msePercentage.toFixed(6) + "%",
-          decryption.npcrPercentage2.toFixed(6) + "%",
+          decryption.mseValue.toFixed(6),
+          decryption.mseValue2.toFixed(6),
           decryption.duration + " ms"
         ]
       )

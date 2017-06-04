@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "setup-esformatter": "npm install esformatter esformatter-align esformatter-asi esformatter-braces esformatter-collapse-objects esformatter-dot-notation esformatter-flow esformatter-jsx esformatter-limit-linebreaks esformatter-literal-notation esformatter-parseint esformatter-quote-props esformatter-quotes esformatter-remove-trailing-commas esformatter-spaced-lined-comment esformatter-var-each",
-    "benchmark": "node ./node_modules/babel-cli/bin/babel-node.js --presets es2015 ./benchmarks/benchmark.js6"
+    "benchmark": "node ./node_modules/babel-cli/bin/babel-node.js --presets es2015 ./benchmarks/benchmark.js6",
+    "test-impl": "node ./node_modules/babel-cli/bin/babel-node.js --presets es2015 ./benchmarks/test_algo.js6"
   },
   "repository": {
     "type": "git",
