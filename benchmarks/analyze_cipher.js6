@@ -33,7 +33,7 @@ function analyzeCipher(name, options) {
     const clonedKey  = _.clone(cipherKey)
 
     clonedKey[fieldName] = _.isInteger(fieldValue)
-      ? (fieldValue + 1) : (fieldValue + Math.pow(10, -5))
+      ? (fieldValue + 1) : (fieldValue + Math.pow(10, -15))
 
     fieldIdx = (fieldIdx + 1) % keyFields.length
 
@@ -209,8 +209,8 @@ function analyzeCipher(name, options) {
           encryption.duration + " ms",
           decryption.mseValue.toFixed(6),
           decryption.duration + " ms",
-          keyQuality.npcrPercentage1.toFixed(6) + "%",
-          keyQuality.uaciPercentage1.toFixed(6) + "%"
+          keyQuality.npcrPercentage2.toFixed(6) + "%",
+          keyQuality.uaciPercentage2.toFixed(6) + "%"
         ]
       )
     })
