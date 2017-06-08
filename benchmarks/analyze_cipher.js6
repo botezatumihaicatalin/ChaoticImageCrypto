@@ -28,12 +28,12 @@ function analyzeCipher(name, options) {
   const slightlyChangeKey = (cipherKey) => {
     const keyFields = _.keysIn(cipherKey)
 
-    const fieldName  = keyFields[fieldIdx]
+    const fieldName = keyFields[fieldIdx]
     const fieldValue = cipherKey[fieldName]
     const clonedKey  = _.clone(cipherKey)
 
     clonedKey[fieldName] = _.isInteger(fieldValue)
-      ? (fieldValue + 1) : (fieldValue + Math.pow(10, -15))
+      ? (fieldValue + 1) : (fieldValue + Math.pow(10, -5))
 
     fieldIdx = (fieldIdx + 1) % keyFields.length
 
@@ -79,13 +79,31 @@ function analyzeCipher(name, options) {
   }
 
   const testDecryptionQuality = (bitmap) => {
+    const pixels = pxutils.toRgbUint8Array(bitmap.data)
+
+    cipher.initKey(cipherKey)
+    const encrypted = cipher.encrypt(pixels)
+
+    let decrypted         = null
+    const decryptDuration = timeOperation(() => {
+      decrypted = cipher.decrypt(encrypted)
+    })
+
+    return {
+      mseValue: pxutils.mseTest(pixels, decrypted),
+      duration: decryptDuration
+    }
+  }
+
+  const testKeySensitivity = (bitmap) => {
     const cipherKey1 = cipherKey
     const cipherKey2 = slightlyChangeKey(cipherKey1)
     const cipherKey3 = slightlyChangeKey(cipherKey1)
     const pixels     = pxutils.toRgbUint8Array(bitmap.data)
 
     cipher.initKey(cipherKey1)
-    const encrypted       = cipher.encrypt(pixels)
+    const encrypted = cipher.encrypt(pixels)
+
     let decrypted1        = null
     const decryptDuration = timeOperation(() => {
       decrypted1 = cipher.decrypt(encrypted)
@@ -98,19 +116,20 @@ function analyzeCipher(name, options) {
     const decrypted3 = cipher.decrypt(encrypted)
 
     return {
-      mseValue:        pxutils.mseTest(pixels, decrypted1),
       npcrPercentage1: pxutils.npcrPercentage(pixels, decrypted2),
+      uaciPercentage1: pxutils.uaciPercentage(pixels, decrypted2),
       npcrPercentage2: pxutils.npcrPercentage(decrypted2, decrypted3),
-      mseValue2:       pxutils.mseTest(decrypted2, decrypted3),
-      duration:        decryptDuration
+      uaciPercentage2: pxutils.uaciPercentage(decrypted2, decrypted3)
     }
+
   }
 
   const readAndTestImage = (imagePath) => {
     return readFilePath(imagePath).then((image) => ({
       source:     testSourceQuality(image.bitmap, imagePath),
       encryption: testEncryptionQuality(image.bitmap, imagePath),
-      decryption: testDecryptionQuality(image.bitmap, imagePath)
+      decryption: testDecryptionQuality(image.bitmap, imagePath),
+      keyQuality: testKeySensitivity(image.bitmap, imagePath)
     }))
   }
 
@@ -145,8 +164,13 @@ function analyzeCipher(name, options) {
           hAlign:  "center"
         },
         {
-          colSpan: 3,
+          colSpan: 2,
           content: "Decryption Quality",
+          hAlign:  "center"
+        },
+        {
+          colSpan: 2,
+          content: "Key Sensitivity",
           hAlign:  "center"
         }
       ]
@@ -162,14 +186,15 @@ function analyzeCipher(name, options) {
         "NPCR (%)",
         "UACI (%)",
         "Duration",
-        "MSE Decr",
-        "MSE Key",
-        "Duration"
+        "MSE",
+        "Duration",
+        "NPCR (%)",
+        "UACI (%)"
       ]
     )
 
     _.forEach(outputs, output => {
-      const {source, encryption, decryption} = output
+      const {source, encryption, decryption, keyQuality} = output
 
       asciiTable.push(
         [
@@ -183,8 +208,9 @@ function analyzeCipher(name, options) {
           encryption.uaciPercentage.toFixed(6) + "%",
           encryption.duration + " ms",
           decryption.mseValue.toFixed(6),
-          decryption.mseValue2.toFixed(6),
-          decryption.duration + " ms"
+          decryption.duration + " ms",
+          keyQuality.npcrPercentage1.toFixed(6) + "%",
+          keyQuality.uaciPercentage1.toFixed(6) + "%"
         ]
       )
     })
