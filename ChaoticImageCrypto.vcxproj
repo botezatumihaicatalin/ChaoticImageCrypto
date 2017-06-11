@@ -26,6 +26,7 @@
     <ClInclude Include="src\generator1.hpp" />
     <ClInclude Include="src\generator3.hpp" />
     <ClInclude Include="src\iesidcm.hpp" />
+    <ClInclude Include="src\image_cipher_base.hpp" />
     <ClInclude Include="src\luts_math.hpp" />
     <ClInclude Include="src\pmath.hpp" />
     <ClInclude Include="src\pwlcm_generator1.hpp" />

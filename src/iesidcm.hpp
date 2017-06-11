@@ -3,13 +3,15 @@
 #include <stdint.h>
 #include <stdexcept>
 
+#include "image_cipher_base.hpp"
 #include "generator3.hpp"
 #include "generator1.hpp"
 #include "cat_generator3.hpp"
 #include "skew_tent_generator1.hpp"
 #include "ruleT_generator3.hpp"
 
-template <size_t spectrum> class iesidcm {
+template <size_t spectrum> 
+class iesidcm: public image_cipher_base<spectrum> {
 
 private:
   static size_t const pixel_size;
@@ -27,9 +29,8 @@ protected:
   static uint8_t* unsubstitute_(uint8_t* pixels, uint32_t size, generator3* mapper, size_t block_size);
 
 public:
-  virtual ~iesidcm() = default;
-  uint8_t* encrypt(uint8_t* pixels, uint32_t size) const;
-  uint8_t* decrypt(uint8_t* pixels, uint32_t size) const;
+  uint8_t* encrypt(uint8_t* pixels, uint32_t size) const override;
+  uint8_t* decrypt(uint8_t* pixels, uint32_t size) const override;
 };
 
 template <size_t spectrum>
@@ -135,9 +136,47 @@ inline uint8_t* iesidcm<spectrum>::unshuffle_(uint8_t* pixels, uint32_t size, ge
 
 template<size_t spectrum>
 inline uint8_t* iesidcm<spectrum>::substitute_(uint8_t* pixels, uint32_t size, generator3* mapper, size_t block_size) {
-  uint8_t* output = new uint8_t[size];
-  memcpy(output, pixels, size * sizeof(uint8_t));
-  return output;
+
+  // Init IV
+  uint8_t* iv = new uint8_t[block_size];
+  for (size_t i = 0; i < block_size; i++) {
+    iv[i] = uint8_t(10 * i + 2);
+  }
+
+  // Init encrypted buffer
+  uint8_t* encrypted = new uint8_t[size];
+
+  // Init algorithm declarations
+  uint8_t u = 0;
+  uint8_t* prev_block = &iv[0];
+  uint8_t* rand_block = new uint8_t[block_size];
+
+  for (size_t b = 0; b < size; b += block_size) {
+
+    uint32_t w = 0;
+    for (size_t p = 0; p < block_size && p + b < size; p++) {
+      w += prev_block[p];
+    }
+
+    for (size_t p = 0; p < block_size && p + b < size; p++) {
+      const dvec3 point = mapper->next();
+      u += w + std::floor(256.0 * (point.x + point.y + point.z));
+      rand_block[p] = u;
+    }
+
+    for (size_t p = 0; p < block_size && p + b < size; p++) {
+      encrypted[b + p] = pixels[b + p] ^ rand_block[p];
+    }
+
+    uint32_t t = 3 + w % 23;
+    for (size_t j = 0; j < t; j++) { mapper->next(); }
+
+    prev_block = encrypted + b;
+  }
+
+  delete[] rand_block, delete[] iv;
+
+  return encrypted;
 }
 
 template<size_t spectrum>
@@ -148,7 +187,7 @@ inline uint8_t* iesidcm<spectrum>::unsubstitute_(uint8_t* pixels, uint32_t size,
 }
 
 template<size_t spectrum>
-inline uint8_t * iesidcm<spectrum>::encrypt(uint8_t* pixels, uint32_t size) const {
+inline uint8_t* iesidcm<spectrum>::encrypt(uint8_t* pixels, uint32_t size) const {
 
   skew_tent_generator1 skew_tent1(0.42377183397545126, 0.9211909680024992);
   skew_tent_generator1 skew_tent2(0.45987045954620664, 0.39736630183773136);
@@ -165,7 +204,7 @@ inline uint8_t * iesidcm<spectrum>::encrypt(uint8_t* pixels, uint32_t size) cons
 }
 
 template<size_t spectrum>
-inline uint8_t * iesidcm<spectrum>::decrypt(uint8_t* pixels, uint32_t size) const {
+inline uint8_t* iesidcm<spectrum>::decrypt(uint8_t* pixels, uint32_t size) const {
 
   skew_tent_generator1 skew_tent1(0.42377183397545126, 0.9211909680024992);
   skew_tent_generator1 skew_tent2(0.45987045954620664, 0.39736630183773136);

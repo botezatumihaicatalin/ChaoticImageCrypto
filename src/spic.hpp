@@ -5,14 +5,15 @@
 #include <cmath>
 #include <stdint.h>
 #include <stdexcept>
+
+#include "image_cipher_base.hpp"
 #include "generator2.hpp"
 #include "spic_key.hpp"
 
-template <size_t spectrum> class spic {
+template <size_t spectrum> 
+class spic: public image_cipher_base<spectrum> {
 
 private:
-  static size_t const pixel_size;
-
   static uint32_t discretize_(const double& value);
 
   static uint32_t* permutation_(uint32_t size, generator2* mapper);
@@ -29,15 +30,7 @@ protected:
                                  generator2* mapper1, generator2* mapper2, uint32_t iv);
   static uint8_t* do_decryption_(uint8_t* pixels, uint32_t size,
                                  generator2* mapper1, generator2* mapper2, uint32_t iv);
-
-public:
-  virtual ~spic() = default;
-  virtual uint8_t* encrypt(uint8_t* pixels, uint32_t size) const = 0;
-  virtual uint8_t* decrypt(uint8_t* pixels, uint32_t size) const = 0;
 };
-
-template <size_t spectrum>
-size_t const spic<spectrum>::pixel_size = spectrum * sizeof(uint8_t);
 
 template <size_t spectrum>
 inline uint32_t spic<spectrum>::discretize_(const double& value) {
