@@ -1,21 +1,21 @@
 #pragma once
 
 #include <nan.h> 
-#include "../src/spic_cipher.hpp"
+#include "../src/image_cipher_base.hpp"
 
 template <size_t spectrum>
-class BaseSpicCipher : public Nan::ObjectWrap {
+class BaseImageCipher : public Nan::ObjectWrap {
 
  private:
-    spic_cipher<spectrum>* image_cipher_;
+   image_cipher_base<spectrum>* image_cipher_;
 
  protected:
- 	BaseSpicCipher(spic_cipher<spectrum>* image_cipher): image_cipher_(image_cipher) { };
- 	virtual ~BaseSpicCipher() { };
+ 	BaseImageCipher(image_cipher_base<spectrum>* image_cipher): image_cipher_(image_cipher) { };
+ 	virtual ~BaseImageCipher() { };
 
   static NAN_METHOD(Encrypt) {
     // Unwrap the javascript object, into our c++ object.
-    BaseSpicCipher* obj = Nan::ObjectWrap::Unwrap<BaseSpicCipher>(info.Holder());
+    BaseImageCipher* obj = Nan::ObjectWrap::Unwrap<BaseImageCipher>(info.Holder());
     
     if (info[0]->IsUint8ClampedArray()) {
 	    // Get typed array contents.
@@ -62,7 +62,7 @@ class BaseSpicCipher : public Nan::ObjectWrap {
 
   static NAN_METHOD(Decrypt) {
   	// Unwrap the javascript object, into our c++ object.
-    BaseSpicCipher* obj = Nan::ObjectWrap::Unwrap<BaseSpicCipher>(info.Holder());
+    BaseImageCipher* obj = Nan::ObjectWrap::Unwrap<BaseImageCipher>(info.Holder());
 
     if (info[0]->IsUint8ClampedArray()) {
 	    // Get typed array contents.

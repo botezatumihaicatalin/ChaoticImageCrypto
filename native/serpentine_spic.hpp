@@ -3,14 +3,14 @@
 #include <nan.h>
 #include <string>
 
-#include "./base_spic.hpp"
+#include "./base_image_cipher.hpp"
 #include "./utils.hpp"
 
 #include "../src/serpentine_spic_cipher.hpp"
 #include "../src/serpentine_spic_key.hpp"
 
 template <size_t spectrum>
-class SerpentineSpicCipher : public BaseSpicCipher<spectrum> {
+class SerpentineSpicCipher : public BaseImageCipher<spectrum> {
  public:
   static NAN_MODULE_INIT(Init) {
     const std::string class_name = "SerpentineSpicCipher" + std::to_string(spectrum);
@@ -31,7 +31,7 @@ class SerpentineSpicCipher : public BaseSpicCipher<spectrum> {
  private:
   serpentine_spic_cipher<spectrum> image_cipher_;
 
-  explicit SerpentineSpicCipher(): BaseSpicCipher<spectrum>(&image_cipher_) {}
+  explicit SerpentineSpicCipher(): BaseImageCipher<spectrum>(&image_cipher_) {}
 
   static NAN_METHOD(New) {
     if (info.IsConstructCall()) {
