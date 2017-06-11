@@ -7,8 +7,9 @@
 #include <cmath>
 #include <iomanip>
 #include <memory>
-#include "pwlcm_spic.hpp"
-#include "serpentine_spic.hpp"
+#include "pwlcm_spic_cipher.hpp"
+#include "serpentine_spic_cipher.hpp"
+#include "iesidcm_cipher.hpp"
 
 template <typename T>
 void print_array(T* array, size_t size) {
@@ -39,9 +40,11 @@ int main() {
 
   clock_t start, end;
   
-  pwlcm_spic<channels> encryptor;
-  encryptor.init_key(pwlcm_spic_key(dvec2(0.1567, 0.3219), dvec2(0.4567, 0.1111),
-                                    0.2, 0.3, 2017, 2016, 123456));
+  //pwlcm_spic<channels> encryptor;
+  //encryptor.init_key(pwlcm_spic_key(dvec2(0.1567, 0.3219), dvec2(0.4567, 0.1111),
+                                   // 0.2, 0.3, 2017, 2016, 123456));
+  iesidcm_cipher<channels> encryptor;
+  
 
   start = clock();
   std::unique_ptr<uint8_t[]> encrypted(encryptor.encrypt(pixels.get(), size * channels));

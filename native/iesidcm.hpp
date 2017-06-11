@@ -4,7 +4,7 @@
 #include <string>
 
 #include "./utils.hpp"
-#include "../src/iesidcm.hpp"
+#include "../src/iesidcm_cipher.hpp"
 
 template <size_t spectrum>
 class IesidcmCipher : public Nan::ObjectWrap {
@@ -26,7 +26,7 @@ public:
   }
 
 private:
-  iesidcm<spectrum> image_cipher_;
+  iesidcm_cipher<spectrum> image_cipher_;
 
   static NAN_METHOD(New) {
     if (info.IsConstructCall()) {

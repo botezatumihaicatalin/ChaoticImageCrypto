@@ -11,7 +11,7 @@
 #include "ruleT_generator3.hpp"
 
 template <size_t spectrum> 
-class iesidcm: public image_cipher_base<spectrum> {
+class iesidcm_cipher: public image_cipher_base<spectrum> {
 
 private:
   static size_t const pixel_size;
@@ -34,16 +34,16 @@ public:
 };
 
 template <size_t spectrum>
-size_t const iesidcm<spectrum>::pixel_size = spectrum * sizeof(uint8_t);
+size_t const iesidcm_cipher<spectrum>::pixel_size = spectrum * sizeof(uint8_t);
 
 template <size_t spectrum>
-inline uint32_t iesidcm<spectrum>::discretize_(const double& value) {
+inline uint32_t iesidcm_cipher<spectrum>::discretize_(const double& value) {
   static double TEN_TO_FIFTEEN = std::pow(10.0, 15);
   return std::abs(std::floor(TEN_TO_FIFTEEN * value));
 }
 
 template <size_t spectrum>
-inline uint32_t* iesidcm<spectrum>::permutation_(uint32_t size, generator3* mapper) {
+inline uint32_t* iesidcm_cipher<spectrum>::permutation_(uint32_t size, generator3* mapper) {
   uint32_t* perm = new uint32_t[size];
   bool* has = new bool[size];
   memset(has, false, size * sizeof(bool));
@@ -88,7 +88,7 @@ inline uint32_t* iesidcm<spectrum>::permutation_(uint32_t size, generator3* mapp
 }
 
 template <size_t spectrum>
-inline uint32_t* iesidcm<spectrum>::inversate_(uint32_t* permutation, uint32_t size) {
+inline uint32_t* iesidcm_cipher<spectrum>::inversate_(uint32_t* permutation, uint32_t size) {
   uint32_t* inverse = new uint32_t[size];
   for (uint32_t i = 0; i < size; i++) { 
     inverse[permutation[i]] = i; 
@@ -97,7 +97,7 @@ inline uint32_t* iesidcm<spectrum>::inversate_(uint32_t* permutation, uint32_t s
 }
 
 template <size_t spectrum>
-inline uint8_t* iesidcm<spectrum>::shuffle_(uint8_t* pixels, uint32_t size, generator3* mapper) {
+inline uint8_t* iesidcm_cipher<spectrum>::shuffle_(uint8_t* pixels, uint32_t size, generator3* mapper) {
   if (size % spectrum != 0) {
     throw std::invalid_argument("Size must be a multiple of spectrum");
   }
@@ -115,7 +115,7 @@ inline uint8_t* iesidcm<spectrum>::shuffle_(uint8_t* pixels, uint32_t size, gene
 }
 
 template <size_t spectrum>
-inline uint8_t* iesidcm<spectrum>::unshuffle_(uint8_t* pixels, uint32_t size, generator3* mapper) {
+inline uint8_t* iesidcm_cipher<spectrum>::unshuffle_(uint8_t* pixels, uint32_t size, generator3* mapper) {
   if (size % spectrum != 0) {
     throw std::invalid_argument("Size must be a multiple of spectrum");
   }
@@ -135,7 +135,7 @@ inline uint8_t* iesidcm<spectrum>::unshuffle_(uint8_t* pixels, uint32_t size, ge
 }
 
 template<size_t spectrum>
-inline uint8_t* iesidcm<spectrum>::substitute_(uint8_t* pixels, uint32_t size, generator3* mapper, size_t block_size) {
+inline uint8_t* iesidcm_cipher<spectrum>::substitute_(uint8_t* pixels, uint32_t size, generator3* mapper, size_t block_size) {
 
   // Init IV
   uint8_t* iv = new uint8_t[block_size];
@@ -180,14 +180,14 @@ inline uint8_t* iesidcm<spectrum>::substitute_(uint8_t* pixels, uint32_t size, g
 }
 
 template<size_t spectrum>
-inline uint8_t* iesidcm<spectrum>::unsubstitute_(uint8_t* pixels, uint32_t size, generator3* mapper, size_t block_size) {
+inline uint8_t* iesidcm_cipher<spectrum>::unsubstitute_(uint8_t* pixels, uint32_t size, generator3* mapper, size_t block_size) {
   uint8_t* output = new uint8_t[size];
   memcpy(output, pixels, size * sizeof(uint8_t));
   return output;
 }
 
 template<size_t spectrum>
-inline uint8_t* iesidcm<spectrum>::encrypt(uint8_t* pixels, uint32_t size) const {
+inline uint8_t* iesidcm_cipher<spectrum>::encrypt(uint8_t* pixels, uint32_t size) const {
 
   skew_tent_generator1 skew_tent1(0.42377183397545126, 0.9211909680024992);
   skew_tent_generator1 skew_tent2(0.45987045954620664, 0.39736630183773136);
@@ -204,7 +204,7 @@ inline uint8_t* iesidcm<spectrum>::encrypt(uint8_t* pixels, uint32_t size) const
 }
 
 template<size_t spectrum>
-inline uint8_t* iesidcm<spectrum>::decrypt(uint8_t* pixels, uint32_t size) const {
+inline uint8_t* iesidcm_cipher<spectrum>::decrypt(uint8_t* pixels, uint32_t size) const {
 
   skew_tent_generator1 skew_tent1(0.42377183397545126, 0.9211909680024992);
   skew_tent_generator1 skew_tent2(0.45987045954620664, 0.39736630183773136);

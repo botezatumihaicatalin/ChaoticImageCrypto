@@ -11,7 +11,7 @@
 #include "spic_key.hpp"
 
 template <size_t spectrum> 
-class spic: public image_cipher_base<spectrum> {
+class spic_cipher: public image_cipher_base<spectrum> {
 
 private:
   static uint32_t discretize_(const double& value);
@@ -33,13 +33,13 @@ protected:
 };
 
 template <size_t spectrum>
-inline uint32_t spic<spectrum>::discretize_(const double& value) {
+inline uint32_t spic_cipher<spectrum>::discretize_(const double& value) {
   static double TEN_TO_FIFTEEN = std::pow(10.0, 15);
   return std::abs(std::floor(TEN_TO_FIFTEEN * value));
 }
 
 template <size_t spectrum>
-inline uint32_t* spic<spectrum>::permutation_(uint32_t size, generator2* mapper) {
+inline uint32_t* spic_cipher<spectrum>::permutation_(uint32_t size, generator2* mapper) {
   uint32_t* perm = new uint32_t[size];
   bool* has = new bool[size];
   memset(has, false, size * sizeof(bool));
@@ -79,14 +79,14 @@ inline uint32_t* spic<spectrum>::permutation_(uint32_t size, generator2* mapper)
 }
 
 template <size_t spectrum>
-inline uint32_t* spic<spectrum>::inversate_(uint32_t* permutation, uint32_t size) {
+inline uint32_t* spic_cipher<spectrum>::inversate_(uint32_t* permutation, uint32_t size) {
   uint32_t* inverse = new uint32_t[size];
   for (uint32_t i = 0; i < size; i++) { inverse[permutation[i]] = i; }
   return inverse;
 }
 
 template <size_t spectrum>
-inline uint8_t* spic<spectrum>::shuffle_(uint8_t* pixels, uint32_t size, generator2* mapper) {
+inline uint8_t* spic_cipher<spectrum>::shuffle_(uint8_t* pixels, uint32_t size, generator2* mapper) {
   if (size % spectrum != 0) {
     throw std::invalid_argument("Size must be a multiple of spectrum");
   }
@@ -106,7 +106,7 @@ inline uint8_t* spic<spectrum>::shuffle_(uint8_t* pixels, uint32_t size, generat
 }
 
 template <size_t spectrum>
-inline uint8_t* spic<spectrum>::unshuffle_(uint8_t* pixels, uint32_t size, generator2* mapper) {
+inline uint8_t* spic_cipher<spectrum>::unshuffle_(uint8_t* pixels, uint32_t size, generator2* mapper) {
   if (size % spectrum != 0) {
     throw std::invalid_argument("Size must be a multiple of spectrum");
   }
@@ -128,7 +128,7 @@ inline uint8_t* spic<spectrum>::unshuffle_(uint8_t* pixels, uint32_t size, gener
 }
 
 template <size_t spectrum>
-inline uint8_t* spic<spectrum>::substitute_(uint8_t* pixels, uint32_t size, generator2* mapper, uint32_t iv) {
+inline uint8_t* spic_cipher<spectrum>::substitute_(uint8_t* pixels, uint32_t size, generator2* mapper, uint32_t iv) {
   if (size % spectrum != 0) {
     throw std::invalid_argument("Size must be a multiple of spectrum");
   }
@@ -161,7 +161,7 @@ inline uint8_t* spic<spectrum>::substitute_(uint8_t* pixels, uint32_t size, gene
 }
 
 template <size_t spectrum>
-inline uint8_t* spic<spectrum>::unsubstitute_(uint8_t* pixels, uint32_t size, generator2* mapper, uint32_t iv) {
+inline uint8_t* spic_cipher<spectrum>::unsubstitute_(uint8_t* pixels, uint32_t size, generator2* mapper, uint32_t iv) {
   if (size % spectrum != 0) {
     throw std::invalid_argument("Size must be a multiple of spectrum");
   }
@@ -194,7 +194,7 @@ inline uint8_t* spic<spectrum>::unsubstitute_(uint8_t* pixels, uint32_t size, ge
 }
 
 template <size_t spectrum>
-inline uint8_t* spic<spectrum>::do_decryption_(uint8_t* pixels, uint32_t size,
+inline uint8_t* spic_cipher<spectrum>::do_decryption_(uint8_t* pixels, uint32_t size,
                                                generator2* mapper1, generator2* mapper2, uint32_t iv) {
   uint8_t* unsubstituted = unsubstitute_(pixels, size, mapper2, iv);
   uint8_t* unshuffled = unshuffle_(unsubstituted, size, mapper1);
@@ -204,7 +204,7 @@ inline uint8_t* spic<spectrum>::do_decryption_(uint8_t* pixels, uint32_t size,
 }
 
 template <size_t spectrum>
-inline uint8_t* spic<spectrum>::do_encryption_(uint8_t* pixels, uint32_t size,
+inline uint8_t* spic_cipher<spectrum>::do_encryption_(uint8_t* pixels, uint32_t size,
                                                generator2* mapper1, generator2* mapper2, uint32_t iv) {
   uint8_t* shuffled = shuffle_(pixels, size, mapper1);
   uint8_t* substituted = substitute_(shuffled, size, mapper2, iv);

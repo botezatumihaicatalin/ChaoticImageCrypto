@@ -1,16 +1,16 @@
 #pragma once
 
 #include <nan.h> 
-#include "../src/spic.hpp"
+#include "../src/spic_cipher.hpp"
 
 template <size_t spectrum>
 class BaseSpicCipher : public Nan::ObjectWrap {
 
  private:
- 	spic<spectrum>* image_cipher_;
+    spic_cipher<spectrum>* image_cipher_;
 
  protected:
- 	BaseSpicCipher(spic<spectrum>* image_cipher): image_cipher_(image_cipher) { };
+ 	BaseSpicCipher(spic_cipher<spectrum>* image_cipher): image_cipher_(image_cipher) { };
  	virtual ~BaseSpicCipher() { };
 
   static NAN_METHOD(Encrypt) {

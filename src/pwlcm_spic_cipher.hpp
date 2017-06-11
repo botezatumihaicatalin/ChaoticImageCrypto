@@ -1,18 +1,18 @@
 #pragma once
 
-#include "spic.hpp"
+#include "spic_cipher.hpp"
 #include "generator2.hpp"
 #include "pwlcm_generator2.hpp"
 #include "pwlcm_spic_key.hpp"
 
 template <size_t spectrum>
-class pwlcm_spic : public spic<spectrum> {
+class pwlcm_spic_cipher : public spic_cipher<spectrum> {
 
 private:
   pwlcm_spic_key* key_;
 
 public:
-  pwlcm_spic() : key_(nullptr) {}
+  pwlcm_spic_cipher() : key_(nullptr) {}
 
   void init_key(const pwlcm_spic_key& key);
   uint8_t* encrypt(uint8_t* pixels, uint32_t size) const override;
@@ -20,12 +20,12 @@ public:
 };
 
 template <size_t spectrum>
-void pwlcm_spic<spectrum>::init_key(const pwlcm_spic_key& key) {
+void pwlcm_spic_cipher<spectrum>::init_key(const pwlcm_spic_key& key) {
   key_ = new pwlcm_spic_key(key);
 }
 
 template <size_t spectrum>
-inline uint8_t* pwlcm_spic<spectrum>::encrypt(uint8_t* pixels, uint32_t size) const {
+inline uint8_t* pwlcm_spic_cipher<spectrum>::encrypt(uint8_t* pixels, uint32_t size) const {
   if (key_ == nullptr) {
     throw std::invalid_argument("You need to call init_key before calling encrypt.");
   }
@@ -39,7 +39,7 @@ inline uint8_t* pwlcm_spic<spectrum>::encrypt(uint8_t* pixels, uint32_t size) co
 }
 
 template <size_t spectrum>
-inline uint8_t* pwlcm_spic<spectrum>::decrypt(uint8_t* pixels, uint32_t size) const {
+inline uint8_t* pwlcm_spic_cipher<spectrum>::decrypt(uint8_t* pixels, uint32_t size) const {
   if (key_ == nullptr) {
     throw std::invalid_argument("You need to call init_key before calling decrypt.");
   }

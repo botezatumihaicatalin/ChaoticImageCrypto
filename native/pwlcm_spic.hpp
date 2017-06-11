@@ -6,7 +6,7 @@
 #include "./base_spic.hpp"
 #include "./utils.hpp"
 
-#include "../src/pwlcm_spic.hpp"
+#include "../src/pwlcm_spic_cipher.hpp"
 #include "../src/pwlcm_spic_key.hpp"
 
 template <size_t spectrum>
@@ -29,7 +29,7 @@ class PwlcmSpicCipher : public BaseSpicCipher<spectrum> {
   }
 
  private:
-  pwlcm_spic<spectrum> image_cipher_;
+  pwlcm_spic_cipher<spectrum> image_cipher_;
 
   explicit PwlcmSpicCipher(): BaseSpicCipher<spectrum>(&image_cipher_) {}
 

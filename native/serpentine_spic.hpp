@@ -6,7 +6,7 @@
 #include "./base_spic.hpp"
 #include "./utils.hpp"
 
-#include "../src/serpentine_spic.hpp"
+#include "../src/serpentine_spic_cipher.hpp"
 #include "../src/serpentine_spic_key.hpp"
 
 template <size_t spectrum>
@@ -29,7 +29,7 @@ class SerpentineSpicCipher : public BaseSpicCipher<spectrum> {
   }
 
  private:
-  serpentine_spic<spectrum> image_cipher_;
+  serpentine_spic_cipher<spectrum> image_cipher_;
 
   explicit SerpentineSpicCipher(): BaseSpicCipher<spectrum>(&image_cipher_) {}
 

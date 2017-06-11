@@ -25,22 +25,22 @@
     <ClInclude Include="src\generator2.hpp" />
     <ClInclude Include="src\generator1.hpp" />
     <ClInclude Include="src\generator3.hpp" />
-    <ClInclude Include="src\iesidcm.hpp" />
+    <ClInclude Include="src\iesidcm_cipher.hpp" />
     <ClInclude Include="src\image_cipher_base.hpp" />
     <ClInclude Include="src\luts_math.hpp" />
     <ClInclude Include="src\pmath.hpp" />
     <ClInclude Include="src\pwlcm_generator1.hpp" />
     <ClInclude Include="src\pwlcm_generator2.hpp" />
-    <ClInclude Include="src\pwlcm_spic.hpp" />
+    <ClInclude Include="src\pwlcm_spic_cipher.hpp" />
     <ClInclude Include="src\pwlcm_spic_key.hpp" />
     <ClInclude Include="src\ruleT_generator3.hpp" />
     <ClInclude Include="src\serpentine2_generator2.hpp" />
-    <ClInclude Include="src\serpentine2_spic.hpp" />
+    <ClInclude Include="src\serpentine2_spic_cipher.hpp" />
     <ClInclude Include="src\serpentine_generator2.hpp" />
-    <ClInclude Include="src\serpentine_spic.hpp" />
+    <ClInclude Include="src\serpentine_spic_cipher.hpp" />
     <ClInclude Include="src\serpentine_spic_key.hpp" />
     <ClInclude Include="src\skew_tent_generator1.hpp" />
-    <ClInclude Include="src\spic.hpp" />
+    <ClInclude Include="src\spic_cipher.hpp" />
     <ClInclude Include="src\spic_key.hpp" />
     <ClInclude Include="src\tmath.hpp" />
   </ItemGroup>
