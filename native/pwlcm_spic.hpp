@@ -11,7 +11,7 @@
 
 template <size_t spectrum>
 class PwlcmSpicCipher : public BaseImageCipher<spectrum> {
- public:
+public:
   static NAN_MODULE_INIT(Init) {
     const std::string class_name = "PwlcmSpicCipher" + std::to_string(spectrum);
 
@@ -28,7 +28,7 @@ class PwlcmSpicCipher : public BaseImageCipher<spectrum> {
       Nan::GetFunction(tpl).ToLocalChecked());
   }
 
- private:
+private:
   pwlcm_spic_cipher<spectrum> image_cipher_;
 
   explicit PwlcmSpicCipher(): BaseImageCipher<spectrum>(&image_cipher_) {}
@@ -43,7 +43,7 @@ class PwlcmSpicCipher : public BaseImageCipher<spectrum> {
       const int argc = 1;
       v8::Local<v8::Value> argv[argc] = {info[0]};
       v8::Local<v8::Function> cons = Nan::New(constructor());
-      info.GetReturnValue().Set(cons->NewInstance(argc, argv));
+      info.GetReturnValue().Set(Nan::NewInstance(cons, argc, argv).ToLocalChecked());
     }
   }
 

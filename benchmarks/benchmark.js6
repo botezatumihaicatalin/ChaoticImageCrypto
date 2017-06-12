@@ -33,3 +33,10 @@ analyzeCipher('Spic cryptosystem with Pwlcm generator', {
 		}
 	})
 })
+.then(() => {
+	return analyzeCipher('Iesicdm cryptosystem', {
+		images: imagesPaths,
+		cipher: new crypto.IesidcmCipher3(),
+		cipherKey: { }
+	})
+})

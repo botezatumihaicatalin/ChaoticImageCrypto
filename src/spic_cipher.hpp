@@ -10,7 +10,7 @@
 #include "generator2.hpp"
 #include "spic_key.hpp"
 
-template <size_t spectrum> 
+template <size_t spectrum>
 class spic_cipher: public image_cipher_base<spectrum> {
 
 private:
@@ -97,7 +97,7 @@ inline uint8_t* spic_cipher<spectrum>::shuffle_(uint8_t* pixels, uint32_t size, 
   uint32_t s_idx = 0, p_idx = 0;
   for (uint32_t idx = 0; idx < size / spectrum; idx++) {
     s_idx = permutation[idx] * spectrum , p_idx = idx * spectrum;
-    memcpy(&shuffled[s_idx], &pixels[p_idx], pixel_size);
+    memcpy(&shuffled[s_idx], &pixels[p_idx], spic_cipher<spectrum>::pixel_size);
   }
 
   delete[] permutation;
@@ -119,7 +119,7 @@ inline uint8_t* spic_cipher<spectrum>::unshuffle_(uint8_t* pixels, uint32_t size
   uint32_t s_idx = 0, p_idx = 0;
   for (uint32_t idx = 0; idx < size / spectrum; idx++) {
     s_idx = inverse[idx] * spectrum , p_idx = idx * spectrum;
-    memcpy(&unshuffled[s_idx], &pixels[p_idx], pixel_size);
+    memcpy(&unshuffled[s_idx], &pixels[p_idx], spic_cipher<spectrum>::pixel_size);
   }
 
   delete[] permutation , delete[] inverse;

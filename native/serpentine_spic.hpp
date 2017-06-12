@@ -43,7 +43,7 @@ class SerpentineSpicCipher : public BaseImageCipher<spectrum> {
       const int argc = 1;
       v8::Local<v8::Value> argv[argc] = { info[0] };
       v8::Local<v8::Function> cons = Nan::New(constructor());
-      info.GetReturnValue().Set(cons->NewInstance(argc, argv));
+      info.GetReturnValue().Set(Nan::NewInstance(cons, argc, argv).ToLocalChecked());
     }
   }
 
