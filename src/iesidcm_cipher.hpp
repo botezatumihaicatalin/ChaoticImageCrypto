@@ -23,8 +23,8 @@ protected:
   static uint8_t* shuffle_(uint8_t* pixels, uint32_t size, generator3* mapper);
   static uint8_t* unshuffle_(uint8_t* pixels, uint32_t size, generator3* mapper);
 
-  static uint8_t* substitute_(uint8_t* pixels, uint32_t size, generator3* mapper, size_t block_size);
-  static uint8_t* unsubstitute_(uint8_t* pixels, uint32_t size, generator3* mapper, size_t block_size);
+  static uint8_t* substitute_(uint8_t* pixels, uint32_t size, generator3* mapper, uint32_t block_size);
+  static uint8_t* unsubstitute_(uint8_t* pixels, uint32_t size, generator3* mapper, uint32_t block_size);
 
 public:
   uint8_t* encrypt(uint8_t* pixels, uint32_t size) const override;
@@ -130,7 +130,10 @@ inline uint8_t* iesidcm_cipher<spectrum>::unshuffle_(uint8_t* pixels, uint32_t s
 }
 
 template<size_t spectrum>
-inline uint8_t* iesidcm_cipher<spectrum>::substitute_(uint8_t* pixels, uint32_t size, generator3* mapper, size_t block_size) {
+inline uint8_t* iesidcm_cipher<spectrum>::substitute_(uint8_t* pixels, uint32_t size, generator3* mapper, uint32_t block_size) {
+  if (size % spectrum != 0) {
+    throw std::invalid_argument("Size must be a multiple of spectrum");
+  }
 
   // Init IV
   uint8_t* iv = new uint8_t[block_size];
@@ -146,25 +149,25 @@ inline uint8_t* iesidcm_cipher<spectrum>::substitute_(uint8_t* pixels, uint32_t 
   uint8_t* prev_block = &iv[0];
   uint8_t* rand_block = new uint8_t[block_size];
 
-  for (size_t b = 0; b < size; b += block_size) {
+  for (uint32_t b = 0; b < size; b += block_size) {
 
     uint32_t w = 0;
-    for (size_t p = 0; p < block_size && p + b < size; p++) {
+    for (uint32_t p = 0; p < block_size && p + b < size; p++) {
       w += prev_block[p];
     }
 
-    for (size_t p = 0; p < block_size && p + b < size; p++) {
+    for (uint32_t p = 0; p < block_size && p + b < size; p++) {
       const dvec3 point = mapper->next();
       u += w + std::floor(256.0 * (point.x + point.y + point.z));
       rand_block[p] = u;
     }
 
-    for (size_t p = 0; p < block_size && p + b < size; p++) {
+    for (uint32_t p = 0; p < block_size && p + b < size; p++) {
       encrypted[b + p] = pixels[b + p] ^ rand_block[p];
     }
 
     const uint32_t t = 3 + w % 23;
-    for (size_t j = 0; j < t; j++) { mapper->next(); }
+    for (uint32_t j = 0; j < t; j++) { mapper->next(); }
 
     prev_block = encrypted + b;
   }
@@ -175,7 +178,10 @@ inline uint8_t* iesidcm_cipher<spectrum>::substitute_(uint8_t* pixels, uint32_t 
 }
 
 template<size_t spectrum>
-inline uint8_t* iesidcm_cipher<spectrum>::unsubstitute_(uint8_t* pixels, uint32_t size, generator3* mapper, size_t block_size) {
+inline uint8_t* iesidcm_cipher<spectrum>::unsubstitute_(uint8_t* pixels, uint32_t size, generator3* mapper, uint32_t block_size) {
+  if (size % spectrum != 0) {
+    throw std::invalid_argument("Size must be a multiple of spectrum");
+  }
 
   // Init IV
   uint8_t* iv = new uint8_t[block_size];
@@ -191,25 +197,25 @@ inline uint8_t* iesidcm_cipher<spectrum>::unsubstitute_(uint8_t* pixels, uint32_
   uint8_t* prev_block = &iv[0];
   uint8_t* rand_block = new uint8_t[block_size];
 
-  for (size_t b = 0; b < size; b += block_size) {
+  for (uint32_t b = 0; b < size; b += block_size) {
 
     uint32_t w = 0;
-    for (size_t p = 0; p < block_size && p + b < size; p++) {
+    for (uint32_t p = 0; p < block_size && p + b < size; p++) {
       w += prev_block[p];
     }
 
-    for (size_t p = 0; p < block_size && p + b < size; p++) {
+    for (uint32_t p = 0; p < block_size && p + b < size; p++) {
       const dvec3 point = mapper->next();
       u += w + std::floor(256.0 * (point.x + point.y + point.z));
       rand_block[p] = u;
     }
 
-    for (size_t p = 0; p < block_size && p + b < size; p++) {
+    for (uint32_t p = 0; p < block_size && p + b < size; p++) {
       decrypted[b + p] = pixels[b + p] ^ rand_block[p];
     }
 
     const uint32_t t = 3 + w % 23;
-    for (size_t j = 0; j < t; j++) { mapper->next(); }
+    for (uint32_t j = 0; j < t; j++) { mapper->next(); }
 
     prev_block = pixels + b;
   }

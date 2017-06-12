@@ -84,6 +84,77 @@ class PixelsUtils {
     return _.mean(sums) / imageSize * 100
   }
 
+  sdValue(pixels) {
+  	if (!_.isArrayLikeObject(pixels)) {
+  		return undefined
+  	}
+
+  	const mean = _.mean(pixels)
+  	const sum = _.sumBy(pixels, p => Math.pow(p - mean, 2))
+  	return Math.sqrt(sum / pixels.length)
+  }
+
+  covValue(pixels1, pixels2) {
+  	if (!_.isArrayLikeObject(pixels1)
+      || !_.isArrayLikeObject(pixels2)) {
+      return undefined
+    }
+
+  	const pixelsSize = _.size(pixels1)
+    if (pixelsSize !== _.size(pixels2)) {
+      return undefined
+    }
+
+    const mean1 = _.mean(pixels1)
+  	const mean2 = _.mean(pixels2)
+
+  	let sum = 0
+    _.forEach(pixels1, (value, idx) => {
+      sum += (pixels1[idx] - mean1) * (pixels2[idx] - mean2)
+    })
+
+    return sum / pixelsSize
+  }
+
+  correlationValue(pixels, width, height, direction = 'vertical', spectrum = 3) {
+  	if (!_.isArrayLikeObject(pixels)) {
+  		return undefined
+  	}
+
+  	const values1 = _.times(spectrum, () => new Array(10000))
+  	const values2 = _.times(spectrum, () => new Array(10000))
+
+  	for (let i = 0; i < 10000; i ++) {
+  		const rand_x = _.random(0, width - 2)
+  		const rand_y = _.random(0, height - 2)
+  		const rand_idx = width * rand_y + rand_x
+
+  		let adj_x = rand_x, adj_y = rand_y
+  		if (direction === 'vertical') {
+  			adj_y ++
+  		}
+  		else if (direction === 'horizontal') {
+  			adj_x ++
+  		}
+  		else if (direction === 'diagonal') {
+  			adj_y ++, adj_x ++
+  		}
+  		const adj_idx = width * adj_y + adj_x
+
+  		for (let c = 0; c < spectrum; c++) {
+  			values1[c][i] = pixels[rand_idx * spectrum + c]
+  			values2[c][i] = pixels[adj_idx * spectrum + c]
+  		}
+  	}
+
+  	const corr = _.times(spectrum, (c) => {
+  		return this.covValue(values1[c], values2[c]) / 
+  			(this.sdValue(values1[c]) * this.sdValue(values2[c]))
+  	})
+
+  	return _.mean(corr)
+  }
+
   uaciPercentage(pixels1, pixels2, spectrum = 3) {
     if (!_.isArrayLikeObject(pixels1)
       || !_.isArrayLikeObject(pixels2)) {

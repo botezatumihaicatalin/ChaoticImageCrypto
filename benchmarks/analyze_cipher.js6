@@ -45,6 +45,9 @@ function analyzeCipher(name, options) {
     return {
       chiSquareValue:     pxutils.chiSquareTest(pixels),
       globalEntropyValue: pxutils.globalEntropyTest(pixels),
+      correlationVValue:  pxutils.correlationValue(pixels, bitmap.width, bitmap.height, 'vertical'),
+      correlationHValue:  pxutils.correlationValue(pixels, bitmap.width, bitmap.height, 'horizontal'),
+      correlationDValue:  pxutils.correlationValue(pixels, bitmap.width, bitmap.height, 'diagonal'),
       dimensions:         [
         bitmap.width,
         bitmap.height
@@ -72,6 +75,9 @@ function analyzeCipher(name, options) {
     return {
       chiSquareValue:     pxutils.chiSquareTest(encrypted1),
       globalEntropyValue: pxutils.globalEntropyTest(encrypted1),
+      correlationVValue:  pxutils.correlationValue(encrypted1, bitmap.width, bitmap.height, 'vertical'),
+      correlationHValue:  pxutils.correlationValue(encrypted1, bitmap.width, bitmap.height, 'horizontal'),
+      correlationDValue:  pxutils.correlationValue(encrypted1, bitmap.width, bitmap.height, 'diagonal'),
       npcrPercentage:     pxutils.npcrPercentage(encrypted1, encrypted2),
       uaciPercentage:     pxutils.uaciPercentage(encrypted1, encrypted2),
       duration:           encryptDuration
@@ -139,7 +145,7 @@ function analyzeCipher(name, options) {
     const asciiTable = new AsciiTable({
       head: [
         {
-          colSpan: 12,
+          colSpan: 14,
           content: name,
           hAlign:  "center"
         }
@@ -154,12 +160,12 @@ function analyzeCipher(name, options) {
           vAlign:  "center"
         },
         {
-          colSpan: 3,
+          colSpan: 4,
           content: "Source Quality",
           hAlign:  "center"
         },
         {
-          colSpan: 5,
+          colSpan: 6,
           content: "Encryption Quality",
           hAlign:  "center"
         },
@@ -180,9 +186,11 @@ function analyzeCipher(name, options) {
       [
         "Chi square",
         "Global entropy",
+        "Correlation",
         "Dimensions",
         "Chi square",
         "Global entropy",
+        "Correlation",
         "NPCR (%)",
         "UACI (%)",
         "Duration",
@@ -201,9 +209,11 @@ function analyzeCipher(name, options) {
           source.name,
           source.chiSquareValue.toFixed(6),
           source.globalEntropyValue.toFixed(9),
+          'V: ' + source.correlationVValue.toFixed(6) + '\n' + 'H: ' + source.correlationHValue.toFixed(6) + '\n' + 'D: ' + source.correlationDValue.toFixed(6),
           source.dimensions.join(" x "),
           encryption.chiSquareValue.toFixed(6),
           encryption.globalEntropyValue.toFixed(9),
+          'V: ' + encryption.correlationVValue.toFixed(6) + '\n' + 'H: ' + encryption.correlationHValue.toFixed(6) + '\n' + 'D: ' + encryption.correlationDValue.toFixed(6),
           encryption.npcrPercentage.toFixed(6) + "%",
           encryption.uaciPercentage.toFixed(6) + "%",
           encryption.duration + " ms",
